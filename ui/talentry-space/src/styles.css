@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body { font-feature-settings: "cv11", "ss01"; }
+  ::selection { background: #fafafa; color: #000000; }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium uppercase tracking-wider transition-colors border;
+  }
+  .btn-primary {
+    @apply btn bg-bone-50 text-ink-950 border-bone-50 hover:bg-bone-200 hover:border-bone-200;
+  }
+  .btn-ghost {
+    @apply btn bg-transparent text-bone-50 border-bone-400 hover:border-bone-50;
+  }
+  .card {
+    @apply border border-bone-400/30 bg-ink-900/60 backdrop-blur-sm;
+  }
+  .hairline {
+    @apply border-bone-400/30;
+  }
+  .pill {
+    @apply inline-block px-2 py-0.5 text-[10px] uppercase tracking-widest border;
+  }
+}

@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+.venv/
+build/
+dist/
+
+# Data (never commit the full pool)
+data/raw/candidates.jsonl
+data/raw/candidates.jsonl.gz
+data/output/
+
+# Node / Vite
+ui/talentry-space/node_modules/
+ui/talentry-space/dist/
+
+# Editor
+.DS_Store
+.idea/
+.vscode/
+
+# OS
+*.log

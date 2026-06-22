@@ -1,0 +1,63 @@
+# Redrob × Hack2Skill India Runs — Talentry AI submission metadata
+team_name: "talentry-ai"
+
+primary_contact:
+  name: "Williyam M"
+  email: "williyam64@gmail.com"
+  phone: "+91-XXXXXXXXXX"
+
+team_members:
+  - name: "Williyam M"
+    email: "williyam64@gmail.com"
+    role: "Solo · ML Engineer / Author"
+
+github_repo: "https://github.com/williyam-m/talentry-ai"
+sandbox_link: "https://huggingface.co/spaces/williyam/talentry-ai"
+
+reproduce_command: "python -m talentry.cli.rank --candidates ./candidates.jsonl --jd configs/job_description.txt --out ./submission.csv"
+
+compute:
+  platform: "MacBook · CPU only"
+  cpu_cores: 8
+  ram_gb: 16
+  python_version: "3.10+"
+  os: "macOS / Linux"
+  uses_gpu_for_inference: false
+  has_network_during_ranking: false
+  pre_computation_required: false
+  pre_computation_time_minutes: 0
+
+ai_tools_used:
+  - "Claude"
+
+ai_usage_summary: |
+  Claude was used as a pair-programmer for architecture brainstorming, code
+  review and documentation polish. **No candidate data was ever sent to a
+  hosted LLM** — the entire ranking pipeline runs offline on CPU with zero
+  network calls (validated in CI).
+
+methodology_summary: |
+  Talentry AI is an explainable, evidence-weighted hybrid ranker.
+
+  Pipeline:
+    1) Rule-based JD parser → JobRequirements (role family, seniority,
+       must-have/nice-to-have/disqualifier skills, location, behavioural
+       priors).
+    2) Per-candidate text blob (career descriptions and summary upweighted).
+    3) Hybrid retrieval over the corpus: BM25 (60%) + TF-IDF cosine (40%).
+    4) Six explainable scoring components: title alignment (anti-stuffer
+       trajectory check), semantic fit, evidence-weighted skill score
+       (endorsements × duration × proficiency × assessment), experience band,
+       location, behavioural multiplier (response rate, recency, notice,
+       verification). Honeypot guard subtracts up to 0.5.
+    5) Hallucination-free per-row reasoning composed from real profile facts
+       (career highlights, top skill cluster, concerns).
+
+  Runs in ~90s for 100K candidates on CPU; outputs a validator-clean CSV.
+
+declarations:
+  read_submission_spec: true
+  code_is_original_work: true
+  no_collusion: true
+  honeypot_check_done: true
+  reproduction_tested: true
