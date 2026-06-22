@@ -13,13 +13,13 @@ export const RunPanel: React.FC<Props> = ({ onResult, onError }) => {
   const [topK, setTopK] = useState<number>(10);
   const [busy, setBusy] = useState(false);
 
-  async function run(useSample: boolean) {
+  async function run() {
     setBusy(true);
     try {
       const res = await postRank({
-        candidates: useSample ? null : candidates,
+        candidates,
         jd,
-        useSample,
+        useSample: false,
         topK,
       });
       onResult(res);
@@ -31,12 +31,13 @@ export const RunPanel: React.FC<Props> = ({ onResult, onError }) => {
   }
 
   return (
-    <section className="card p-6">
-      <h2 className="text-sm uppercase tracking-widest text-bone-300 mb-4">
+    <section className="card-glow p-6 sm:p-8 transition-transform duration-500 hover:-translate-y-1">
+      <h2 className="text-sm uppercase tracking-widest text-bone-300 mb-5 flex items-center gap-2">
+        <span className="inline-block w-2 h-2 rounded-full bg-bone-50 animate-pulse" />
         Run the ranker
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
         <FileField
           label="Candidates (.json / .jsonl / .jsonl.gz)"
           onChange={setCandidates}
@@ -51,7 +52,7 @@ export const RunPanel: React.FC<Props> = ({ onResult, onError }) => {
         />
       </div>
 
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex flex-wrap items-center gap-4 mb-6">
         <label className="text-xs uppercase tracking-widest text-bone-300">
           Top‑K
         </label>
@@ -61,28 +62,35 @@ export const RunPanel: React.FC<Props> = ({ onResult, onError }) => {
           max={100}
           value={topK}
           onChange={(e) => setTopK(Number(e.target.value))}
-          className="w-24 bg-ink-800 border hairline px-3 py-1.5 text-sm font-mono"
+          className="w-24 bg-ink-800/80 border hairline px-3 py-1.5 text-sm font-mono focus:outline-none focus:border-bone-50 transition-colors"
         />
-        <span className="text-[11px] text-bone-400">
-          Hackathon submission requires exactly <span className="text-bone-50">100</span>.
-        </span>
       </div>
 
       <div className="flex flex-wrap gap-3">
         <button
-          className="btn-primary disabled:opacity-50"
+          className="btn-primary disabled:opacity-50 group"
           disabled={busy || !candidates}
-          onClick={() => run(false)}
+          onClick={run}
         >
-          {busy ? "Ranking…" : "Rank uploaded pool"}
-        </button>
-        <button className="btn-ghost disabled:opacity-50" disabled={busy} onClick={() => run(true)}>
-          {busy ? "Ranking…" : "Use bundled sample (50)"}
+          {busy ? (
+            <>
+              <Spinner /> Ranking…
+            </>
+          ) : (
+            <>
+              Rank uploaded pool
+              <span className="transition-transform group-hover:translate-x-0.5">→</span>
+            </>
+          )}
         </button>
       </div>
     </section>
   );
 };
+
+const Spinner: React.FC = () => (
+  <span className="inline-block w-3 h-3 border-2 border-ink-950 border-t-transparent rounded-full animate-spin" />
+);
 
 const FileField: React.FC<{
   label: string;
@@ -92,7 +100,7 @@ const FileField: React.FC<{
 }> = ({ label, file, onChange, accept }) => (
   <label className="block">
     <div className="text-[11px] uppercase tracking-widest text-bone-400 mb-2">{label}</div>
-    <div className="card flex items-center justify-between px-4 py-3">
+    <div className="card flex items-center justify-between px-4 py-3 hover:border-bone-50/40 transition-colors">
       <span className="font-mono text-xs truncate text-bone-200 max-w-[60%]">
         {file ? file.name : "no file"}
       </span>
