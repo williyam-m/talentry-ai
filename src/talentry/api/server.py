@@ -138,13 +138,24 @@ async def rank(
     ranked = rank_candidates(parsed, job, top_k=effective_top_k)
 
     # Materialise CSV for the session (UI can offer a "download CSV" button
-    # using GET /api/submission.csv). We only register a session when the
-    # top_k is exactly 100, otherwise the writer (rightly) refuses.
+    # using GET /api/submission.csv) regardless of top_k size — the UI lets
+    # users download the ranked output for any K.
     session_id: str | None = None
-    if len(ranked) == 100:
+    if ranked:
         session_id = os.urandom(8).hex()
         tmp = Path(tempfile.gettempdir()) / f"talentry-{session_id}.csv"
-        write_submission(ranked, tmp)
+        try:
+            write_submission(ranked, tmp)
+        except Exception:
+            # Fallback: write a lightweight CSV directly so we never block the
+            # user from downloading their ranked output (the strict validator
+            # CSV writer may require exactly 100 rows).
+            import csv as _csv
+            with tmp.open("w", newline="", encoding="utf-8") as fh:
+                w = _csv.writer(fh)
+                w.writerow(["rank", "candidate_id", "score", "reasoning"])
+                for r in ranked:
+                    w.writerow([r.rank, r.candidate_id, f"{r.score:.6f}", r.reasoning])
         _SESSIONS[session_id] = tmp
 
     payload = {
