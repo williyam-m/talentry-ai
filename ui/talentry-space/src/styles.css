@@ -3,27 +3,165 @@
 @tailwind utilities;
 
 @layer base {
-  body { font-feature-settings: "cv11", "ss01"; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-feature-settings: "cv11", "ss01";
+    background-color: #000;
+    color: #fafafa;
+    overflow-x: hidden;
+  }
   ::selection { background: #fafafa; color: #000000; }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: #0a0a0a; }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #2b2b2b, #1f1f1f);
+    border-radius: 6px;
+    border: 2px solid #0a0a0a;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: #4a4a4a; }
 }
 
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium uppercase tracking-wider transition-colors border;
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium uppercase tracking-wider transition-all border;
   }
   .btn-primary {
-    @apply btn bg-bone-50 text-ink-950 border-bone-50 hover:bg-bone-200 hover:border-bone-200;
+    @apply btn bg-bone-50 text-ink-950 border-bone-50 hover:bg-bone-200 hover:border-bone-200 hover:shadow-[0_8px_30px_rgba(250,250,250,0.15)] hover:-translate-y-0.5;
   }
   .btn-ghost {
-    @apply btn bg-transparent text-bone-50 border-bone-400 hover:border-bone-50;
+    @apply btn bg-transparent text-bone-50 border-bone-400 hover:border-bone-50 hover:bg-bone-50/5;
   }
   .card {
-    @apply border border-bone-400/30 bg-ink-900/60 backdrop-blur-sm;
+    @apply border border-bone-400/30 bg-ink-900/60 backdrop-blur-sm rounded-md;
   }
-  .hairline {
-    @apply border-bone-400/30;
+  .card-glow {
+    @apply relative border border-bone-400/30 bg-ink-900/60 backdrop-blur-sm rounded-md;
+    background-image:
+      linear-gradient(rgba(10,10,10,0.6), rgba(10,10,10,0.6)),
+      radial-gradient(800px circle at var(--mx,50%) var(--my,0%), rgba(250,250,250,0.06), transparent 40%);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 30px 80px -40px rgba(0,0,0,0.8);
+    transition: border-color 300ms ease, transform 500ms ease, box-shadow 500ms ease;
   }
+  .card-glow:hover {
+    border-color: rgba(250,250,250,0.35);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.06) inset,
+      0 40px 80px -40px rgba(0,0,0,0.9),
+      0 0 0 1px rgba(250,250,250,0.06);
+  }
+  .hairline { @apply border-bone-400/30; }
   .pill {
-    @apply inline-block px-2 py-0.5 text-[10px] uppercase tracking-widest border;
+    @apply inline-block px-2 py-0.5 text-[10px] uppercase tracking-widest border rounded-full;
   }
+
+  /* Reasoning panel hover — fix: when hovered we now darken text so it stays readable
+     against a lighter background, AND we keep the dark theme readable too. */
+  .reasoning-box .reasoning-text {
+    color: #cfcfcf; /* default on dark */
+  }
+  .reasoning-box:hover {
+    background-color: #fafafa;
+    border-color: #fafafa;
+  }
+  .reasoning-box:hover .reasoning-text,
+  .reasoning-box:hover .text-bone-400 {
+    color: #000000 !important; /* dark black on white */
+  }
+
+  /* Table row hover — keep text readable on light hover */
+  .row-hover:hover:not(.bg-bone-50) {
+    background-color: rgba(255,255,255,0.04);
+  }
+
+  .custom-scroll::-webkit-scrollbar { width: 8px; }
+}
+
+/* ───── Animated decorative backgrounds ───────────────────────────── */
+.bg-aurora {
+  position: fixed;
+  inset: -20%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(40% 30% at 20% 20%, rgba(120,140,180,0.18), transparent 60%),
+    radial-gradient(35% 25% at 80% 30%, rgba(180,120,160,0.14), transparent 60%),
+    radial-gradient(40% 30% at 60% 80%, rgba(120,180,160,0.12), transparent 60%);
+  filter: blur(40px);
+  animation: aurora-shift 18s ease-in-out infinite alternate;
+}
+@keyframes aurora-shift {
+  0%   { transform: translate3d(-2%, -1%, 0) scale(1); }
+  50%  { transform: translate3d(2%, 1%, 0) scale(1.05); }
+  100% { transform: translate3d(-1%, 2%, 0) scale(1); }
+}
+
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 35%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 35%, transparent 80%);
+  animation: grid-pan 30s linear infinite;
+}
+@keyframes grid-pan {
+  to { background-position: 56px 56px; }
+}
+
+.bg-spotlight {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  transition: background 200ms ease-out;
+}
+
+.bg-noise {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.6'/></svg>");
+}
+
+/* Reveal on scroll */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px) perspective(800px) rotateX(2deg);
+  transition: opacity 700ms ease, transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  will-change: opacity, transform;
+}
+.reveal-in {
+  opacity: 1;
+  transform: translateY(0) perspective(800px) rotateX(0);
+}
+
+/* Slow bounce for the exclamation mark */
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+.animate-bounce-slow { animation: bounce-slow 2.4s ease-in-out infinite; display: inline-block; }
+
+/* Subtle floating animation utility */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+.animate-float { animation: float 5s ease-in-out infinite; }
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .bg-aurora, .bg-grid, .animate-bounce-slow, .animate-float, .animate-pulse, .animate-spin {
+    animation: none !important;
+  }
+  .reveal { opacity: 1; transform: none; }
 }
