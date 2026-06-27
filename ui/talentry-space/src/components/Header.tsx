@@ -66,14 +66,13 @@ export const Header: React.FC<{ version?: string }> = ({ version }) => {
 
 const Logo: React.FC = () => (
   <span className="relative inline-flex">
-    <span className="absolute inset-0 blur-md bg-bone-50/30 rounded-full animate-pulse" aria-hidden />
     <svg
       width="34"
       height="34"
       viewBox="0 0 40 40"
       fill="none"
       aria-hidden
-      className="relative transition-transform duration-500 group-hover:rotate-[360deg]"
+      className="relative"
     >
       <rect x="1" y="1" width="38" height="38" stroke="#fafafa" strokeWidth="1.5" />
       <path d="M8 28 L20 8 L32 28 Z" stroke="#fafafa" strokeWidth="1.5" />
@@ -81,3 +80,4 @@ const Logo: React.FC = () => (
     </svg>
   </span>
 );
+
