@@ -12,8 +12,9 @@ official ``candidate_schema.json``:
 
 The validator surfaces *every* error (it does not bail on first) and
 returns structured `SchemaError` objects so the UI can render a
-GitHub-style green/red diff between the candidate's record and the
-expected shape.
+git-diff-style payload describing what's missing / extra / wrong
+between the candidate's record and the expected shape.
+
 """
 
 from __future__ import annotations
@@ -302,7 +303,8 @@ def validate_batch(records: list[dict[str, Any]], *, max_rows_reported: int = 25
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Diff utilities — used by the UI to render a GitHub-style green/red diff.
+# Diff utilities — used by the UI to render a git diff style report.
+
 
 
 def _flatten(value: Any, prefix: str = "", out: dict[str, Any] | None = None) -> dict[str, Any]:
