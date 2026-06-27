@@ -168,7 +168,7 @@ export const ResumeUpload: React.FC<Props> = ({ onParsed }) => {
                 Download .json
               </button>
             </div>
-            <ul className="space-y-1.5 max-h-72 overflow-auto custom-scroll">
+            <ul className="space-y-1.5 max-h-72 overflow-auto custom-scroll overscroll-contain" data-lenis-prevent>
               {response.results.map((r, i) => {
                 const rec = r.record as Record<string, unknown>;
                 const profile = (rec.profile as Record<string, unknown>) || {};
