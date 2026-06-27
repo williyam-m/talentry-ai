@@ -15,7 +15,11 @@ export const ResultsTable: React.FC<Props> = ({ rows, onSelect, selectedId }) =>
       </h2>
       <span className="text-[11px] text-bone-400 font-mono">click a row →</span>
     </div>
-    <div className="max-h-[60vh] overflow-auto custom-scroll">
+    <div
+      className="max-h-[60vh] overflow-auto custom-scroll overscroll-contain"
+      data-lenis-prevent
+    >
+
       <table className="w-full text-sm border-collapse">
         <thead className="sticky top-0 bg-ink-900/95 backdrop-blur text-bone-400 z-10">
           <tr className="text-left text-[10px] uppercase tracking-widest">
