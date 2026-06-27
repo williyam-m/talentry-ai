@@ -472,6 +472,11 @@ async def rank(
     # JD bytes were already read above (so they could participate in the
     # cache key). Decode them into text here using the right extractor for
     # the file format.
+    #
+    # NOTE: when the user uploaded a JD we must NEVER silently fall back
+    # to the bundled default. If decoding produces empty text we raise
+    # HTTP 422 so the UI surfaces the problem instead of returning a
+    # ranking that quietly used the default JD.
     jd_text: str | None = None
     if jd_bytes:
         try:
@@ -485,10 +490,16 @@ async def rank(
                 jd_text = jd_bytes.decode("utf-8", errors="replace")
         except Exception as exc:
             raise HTTPException(422, f"could not read job description: {exc}") from exc
+        if not jd_text or not jd_text.strip():
+            raise HTTPException(
+                422,
+                "uploaded job description decoded to empty text; "
+                "please re-export the file (.docx / .pdf / .txt / .md) and retry",
+            )
     job = parse_job_description(jd_text)
     if jd_text:
         _LOG.info(
-            "rank: using uploaded JD (%s, %d bytes, %d chars)",
+            "rank: using UPLOADED JD (%s, %d bytes, %d chars) — default JD ignored",
             jd_filename or "?",
             len(jd_bytes or b""),
             len(jd_text),
