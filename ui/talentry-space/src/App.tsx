@@ -1,21 +1,25 @@
 /**
- * Talentry AI — the application shell.
+ * Talentry AI — application shell.
  *
  * Composition (top → bottom):
  *   <Header/>            sticky logo + nav
  *   <Hero/>              big-type intro
  *   <RunPanel/>          drag-drop + "Feed sample candidates" button
- *   <ResumeUpload/>      multi-résumé → schema-clean records
  *   <SchemaPanel/>       collapsible JSON-Schema docs
  *   <SchemaDiff/>        only when /api/rank rejects upload (HTTP 422)
  *   <JdSummary/>         backend's interpretation of the JD
  *   <ResultsTable + Breakdown/>   ranked top-K with explainability
  *   <Storytelling/>      sticky 3D scene + scroll-triggered guide
+ *   <ResumeUpload/>      multi-résumé → schema-clean records (last section)
  *   <Footer/>
  *
  * Smooth scrolling is provided by Lenis (Stripe-like inertia), and the
  * Storytelling section drives a 3D scene that morphs as the user scrolls
  * through the pipeline steps.
+ *
+ * IMPORTANT: the Storytelling section is intentionally NOT wrapped in a
+ * `.reveal` div with `overflow-hidden` semantics — that would clip the
+ * sticky 3D scene as soon as the section came into view.
  */
 
 import React, { useEffect, useState } from "react";
@@ -143,7 +147,7 @@ const App: React.FC = () => {
         <section className="reveal">
           <div className="inline-flex items-center gap-2 pill border-bone-400/40 text-bone-300 bg-bone-50/5 mb-5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            Explainable · CPU-only · Zero LLM calls
+            Hybrid retrieval · CPU-only · Zero LLM calls
           </div>
           <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.02]">
             <span className="bg-gradient-to-br from-bone-50 via-bone-100 to-bone-400 bg-clip-text text-transparent">
@@ -152,15 +156,11 @@ const App: React.FC = () => {
             <span className="inline-block animate-bounce-slow text-bone-50">!</span>
           </h2>
           <p className="mt-5 text-base sm:text-lg text-bone-300 max-w-2xl">
-            Rank 100,000 candidates against any JD in under 90 seconds — every
-            score explained, every record schema-validated, every byte streamed.
+            BM25 + TF-IDF hybrid ranking with schema-first ingestion, behavioural
+            signals, honeypot detection and a fully explainable score
+            breakdown — 100,000 candidates in under 90 seconds, no GPU, no LLM API calls.
           </p>
         </section>
-
-        {/* ─── Schema docs (collapsible) ─────────────────────────────── */}
-        <div className="reveal">
-          <SchemaPanel />
-        </div>
 
         {/* ─── Run controls ──────────────────────────────────────────── */}
         <div className="reveal">
@@ -178,9 +178,9 @@ const App: React.FC = () => {
           />
         </div>
 
-        {/* ─── Resume uploader ───────────────────────────────────────── */}
+        {/* ─── Schema docs (collapsible) ─────────────────────────────── */}
         <div className="reveal">
-          <ResumeUpload onParsed={(file) => setPrefilledCandidates(file)} />
+          <SchemaPanel />
         </div>
 
         {/* ─── Schema-validation diff ────────────────────────────────── */}
@@ -227,14 +227,22 @@ const App: React.FC = () => {
           </div>
         )}
 
-        {/* ─── Immersive storytelling guide ──────────────────────────── */}
+        {/*
+          ─── Immersive storytelling guide ────────────────────────────
+          NOTE: deliberately NOT wrapped in `.reveal` — that wrapper applies a
+          CSS transform which establishes a containing block for `position:
+          sticky` descendants and would prevent the 3D scene from pinning.
+        */}
+        <Storytelling />
+
+        {/* ─── Résumé uploader (last) ────────────────────────────────── */}
         <div className="reveal">
-          <Storytelling />
+          <ResumeUpload onParsed={(file) => setPrefilledCandidates(file)} />
         </div>
       </main>
 
       <footer className="relative z-10 border-t hairline text-[11px] text-bone-400 px-4 sm:px-6 py-5 mx-auto max-w-7xl w-full flex flex-wrap justify-between gap-3">
-        <span>Crafted with care for explainable hiring.</span>
+        <span>Engineered for explainable, low-latency hiring.</span>
         <span className="font-mono">
           © {new Date().getFullYear()} Williyam M · MIT licensed
         </span>
