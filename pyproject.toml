@@ -25,6 +25,8 @@ dependencies = [
   "pyyaml>=6.0",
   "tqdm>=4.66",
   "orjson>=3.9",
+  # Resume parsing — keeps the wheel tiny (no native deps).
+  "pypdf>=4.3",
 ]
 
 [project.optional-dependencies]
