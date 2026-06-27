@@ -25,20 +25,22 @@ It explicitly down-weights:
 
 ## 2. Trying it without installing anything
 
-1. Open the live HuggingFace Space:
-   <https://huggingface.co/spaces/williyam/talentry-ai>
-2. Click **"Use bundled sample (50)"**.
+1. Open the live demo: **<https://williyam-talentry-ai.hf.space>**
+   (HF repo: <https://huggingface.co/spaces/williyam/talentry-ai>)
+2. Click **"Feed sample candidates"**.
 3. You'll see the parsed JD card, a ranked-row table, and a per-candidate
    score breakdown with reasoning.
 
 ## 3. Running on your own data
 
-1. Click **"Rank uploaded pool"** in the Run panel.
-2. Choose your `candidates.jsonl` (or `.json` / `.jsonl.gz`).
-3. (Optional) Upload a custom `.txt` job description.
-4. Set **Top-K = 100** if you want the validator-clean submission CSV.
-5. Click *Rank uploaded pool*; download the CSV via the "⬇ Download
-   submission.csv" button.
+1. Drop your `candidates.jsonl` (or `.json` / `.jsonl.gz`) onto the
+   **Candidates** dropzone.
+2. (Optional) Drop a custom job description: `.txt` / `.md` / `.docx` / `.pdf`.
+   If left empty, the bundled Senior-AI-Engineer JD is used.
+3. Set **Top-K = 100** if you want the validator-clean submission file.
+4. Click **"Rank uploaded pool"**; download either `Ranked_shortlist.csv`
+   (validator-clean) or `Ranked_shortlist.xlsx` (styled for human review).
+
 
 ## 4. Running locally (CLI)
 
