@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import type { RankedRow } from "../types";
 
 interface Props {
@@ -7,7 +7,41 @@ interface Props {
   selectedId: string | null;
 }
 
-export const ResultsTable: React.FC<Props> = ({ rows, onSelect, selectedId }) => (
+/**
+ * Trap wheel + touch scroll inside a scrollable container so that when the
+ * user reaches the top or bottom edge the *page* does not start scrolling.
+ *
+ * `overscroll-behavior: contain` (the CSS-only fix) is honoured by Chrome
+ * and Safari but is famously inconsistent on macOS trackpads with inertial
+ * scrolling, and Lenis can still pick the wheel event up before the browser
+ * applies overscroll-contain. We additionally cancel any wheel delta that
+ * would attempt to scroll *past* the container's edges. This is the same
+ * pattern used by Linear, Notion's command palette, etc.
+ */
+function useScrollIsolation<T extends HTMLElement>() {
+  const ref = useRef<T | null>(null);
+  const onWheel = (e: React.WheelEvent<T>) => {
+    const el = ref.current;
+    if (!el) return;
+    const { scrollTop, scrollHeight, clientHeight } = el;
+    const atTop = scrollTop <= 0;
+    const atBottom = scrollTop + clientHeight >= scrollHeight - 1;
+    // Block bubble-up only when trying to scroll past an edge.
+    if ((atTop && e.deltaY < 0) || (atBottom && e.deltaY > 0)) {
+      e.preventDefault();
+      e.stopPropagation();
+    } else {
+      // Inside the box — stop propagation so the page (and Lenis) don't
+      // also consume the same delta.
+      e.stopPropagation();
+    }
+  };
+  return { ref, onWheel };
+}
+
+export const ResultsTable: React.FC<Props> = ({ rows, onSelect, selectedId }) => {
+  const scroll = useScrollIsolation<HTMLDivElement>();
+  return (
   <section className="card-glow overflow-hidden">
     <div className="px-6 py-4 border-b hairline flex items-center justify-between">
       <h2 className="text-sm uppercase tracking-widest text-bone-300">
@@ -16,7 +50,10 @@ export const ResultsTable: React.FC<Props> = ({ rows, onSelect, selectedId }) =>
       <span className="text-[11px] text-bone-400 font-mono">click a row →</span>
     </div>
     <div
+      ref={scroll.ref}
+      onWheel={scroll.onWheel}
       className="max-h-[60vh] overflow-auto custom-scroll overscroll-contain"
+      style={{ overscrollBehavior: "contain" }}
       data-lenis-prevent
     >
 
@@ -57,4 +94,6 @@ export const ResultsTable: React.FC<Props> = ({ rows, onSelect, selectedId }) =>
       </table>
     </div>
   </section>
-);
+  );
+};
+
