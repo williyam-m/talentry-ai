@@ -12,6 +12,8 @@ dist/
 data/raw/candidates.jsonl
 data/raw/candidates.jsonl.gz
 data/output/
+# `data/redrob_submission/` IS committed - it's the deliverable.
+
 
 # Node / Vite
 ui/talentry-space/node_modules/
