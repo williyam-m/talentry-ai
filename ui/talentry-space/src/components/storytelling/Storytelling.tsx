@@ -167,7 +167,7 @@ export const Storytelling: React.FC = () => {
           <div className="mx-auto max-w-7xl w-full px-4 sm:px-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
               {/* ── Left: crossfaded text ─────────────────────────── */}
-              <div className="relative min-h-[60vh]">
+              <div className="relative h-[72vh]">
                 {STEPS.map((s, i) => (
                   <motion.div
                     key={s.id}
@@ -175,11 +175,12 @@ export const Storytelling: React.FC = () => {
                     animate={{
                       opacity: active === i ? 1 : 0,
                       y: active === i ? 0 : 16,
-                      pointerEvents: active === i ? "auto" : "none",
                     }}
+                    style={{ pointerEvents: active === i ? "auto" : "none" }}
                     transition={{ duration: 0.55, ease: [0.2, 0.7, 0.2, 1] }}
                     className="absolute inset-0 flex flex-col justify-center max-w-xl"
                   >
+
                     <div className="text-[11px] uppercase tracking-[0.25em] text-bone-400">
                       {s.kicker}
                     </div>
