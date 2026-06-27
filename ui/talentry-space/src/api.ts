@@ -177,3 +177,8 @@ export async function postParseResumes(files: File[]): Promise<ParseResumesRespo
 export function csvDownloadUrl(session: string): string {
   return `${BASE}/api/submission.csv?session=${encodeURIComponent(session)}`;
 }
+
+export function xlsxDownloadUrl(session: string): string {
+  return `${BASE}/api/submission.xlsx?session=${encodeURIComponent(session)}`;
+}
+
