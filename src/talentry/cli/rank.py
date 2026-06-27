@@ -19,7 +19,8 @@ from pathlib import Path
 
 from talentry import __version__
 from talentry.io.candidates import load_candidates
-from talentry.io.submission import write_submission
+from talentry.io.submission import write_submission, write_submission_xlsx
+
 from talentry.ranker import parse_job_description, rank_candidates
 
 
@@ -44,8 +45,17 @@ def _build_parser() -> argparse.ArgumentParser:
         "--out",
         type=Path,
         default=Path("submission.csv"),
-        help="Output CSV path. Default: submission.csv",
+        help=(
+            "Output path. Format is inferred from the extension: "
+            ".csv -> CSV, .xlsx -> Excel. Default: submission.csv"
+        ),
     )
+    p.add_argument(
+        "--also-xlsx",
+        action="store_true",
+        help="Also emit a sibling .xlsx file next to --out (handy for human review).",
+    )
+
     p.add_argument(
         "--top-k",
         type=int,
@@ -97,13 +107,25 @@ def main(argv: list[str] | None = None) -> int:
         )
 
     strict = args.top_k == 100
-    out = write_submission(ranked, args.out, strict=strict)
+    out_ext = args.out.suffix.lower()
+    if out_ext == ".xlsx":
+        out = write_submission_xlsx(ranked, args.out, strict=strict)
+    else:
+        out = write_submission(ranked, args.out, strict=strict)
     log.info(
         "[talentry-rank] wrote %s submission → %s",
         "strict-validated" if strict else f"non-strict (top_k={args.top_k})",
         out,
     )
+
+    # Optional sibling .xlsx for human review.
+    if args.also_xlsx and out_ext != ".xlsx":
+        sibling = args.out.with_suffix(".xlsx")
+        write_submission_xlsx(ranked, sibling, strict=strict)
+        log.info("[talentry-rank] also wrote XLSX → %s", sibling)
+
     return 0
+
 
 
 if __name__ == "__main__":  # pragma: no cover
