@@ -13,7 +13,7 @@ def _cand(skills):
 
 
 def test_keyword_stuffer_is_detected():
-    # Six "expert" AI claims with zero evidence — classic stuffer.
+    # Six "expert" AI claims with zero evidence - classic stuffer.
     stuffer = _cand([
         Skill(name="LangChain", proficiency="expert", endorsements=0, duration_months=1),
         Skill(name="Pinecone", proficiency="expert", endorsements=0, duration_months=2),

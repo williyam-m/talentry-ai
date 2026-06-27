@@ -1,4 +1,4 @@
-# Talentry AI — UI Guide
+# Talentry AI - UI Guide
 
 The Talentry HuggingFace Space front-end is a single-page React + TypeScript
 application built with Vite and Tailwind. It is intentionally
@@ -16,7 +16,7 @@ application built with Vite and Tailwind. It is intentionally
 | Styling    | Tailwind CSS 3                    |
 | Fonts      | Inter (UI), JetBrains Mono (data) |
 
-No state-management library, no router, no UI library — the UI is intentionally
+No state-management library, no router, no UI library - the UI is intentionally
 boring so that the *content* (the ranking explainability) is what stands out.
 
 ## 2. Component map
@@ -52,7 +52,7 @@ Space) the SPA is served by the same Uvicorn instance on `:7860`.
 
 ## 4. Design language
 
-* **Palette** — `#000000`, `#0a0a0a`, `#141414`, `#fafafa`, `#9a9a9a`.
-* **Type** — Inter for UI text, JetBrains Mono for IDs / scores / numbers.
-* **Component vocab** — `.card` (hairline border, dark fill), `.pill`
+* **Palette** - `#000000`, `#0a0a0a`, `#141414`, `#fafafa`, `#9a9a9a`.
+* **Type** - Inter for UI text, JetBrains Mono for IDs / scores / numbers.
+* **Component vocab** - `.card` (hairline border, dark fill), `.pill`
   (tiny tracking-widest tag), `.btn-primary` / `.btn-ghost`.

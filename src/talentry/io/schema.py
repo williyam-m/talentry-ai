@@ -1,7 +1,7 @@
 """Candidate schema accessor + lightweight JSON-Schema validator.
 
 We deliberately avoid pulling in `jsonschema` (and its `referencing`,
-`attrs`, `rpds-py` Rust wheel) just to validate a handful of fields —
+`attrs`, `rpds-py` Rust wheel) just to validate a handful of fields -
 keeping the runtime image lean is a hard production requirement for the
 HF Space cold-start budget. Instead we ship a *focused* validator that
 understands exactly the subset of JSON-Schema draft-07 used by the
@@ -303,7 +303,7 @@ def validate_batch(records: list[dict[str, Any]], *, max_rows_reported: int = 25
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Diff utilities — used by the UI to render a git diff style report.
+# Diff utilities - used by the UI to render a git diff style report.
 
 
 

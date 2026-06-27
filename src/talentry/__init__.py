@@ -1,4 +1,4 @@
-"""Talentry AI — intelligent candidate discovery and ranking."""
+"""Talentry AI - intelligent candidate discovery and ranking."""
 
 from importlib.metadata import PackageNotFoundError, version
 

@@ -1,11 +1,11 @@
-"""Candidate I/O — load JSONL (plain or gzipped) into our domain models.
+"""Candidate I/O - load JSONL (plain or gzipped) into our domain models.
 
 We keep two surfaces:
 
-* :func:`iter_candidate_records` — yields raw ``dict`` payloads, one per line.
+* :func:`iter_candidate_records` - yields raw ``dict`` payloads, one per line.
   This is useful for streaming workflows where the caller wants to materialise
   only what they need (e.g. the UI showing 50 candidates).
-* :func:`load_candidates` — fully materialises into :class:`Candidate` objects
+* :func:`load_candidates` - fully materialises into :class:`Candidate` objects
   and is the entry point used by the ranker.
 
 Both are tolerant of:

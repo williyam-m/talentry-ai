@@ -12,7 +12,7 @@ def test_pipeline_runs_on_sample_and_ranks_recsys_engineer_first():
     jd = parse_job_description(None)
     ranked = rank_candidates(cands, jd, top_k=5)
     assert len(ranked) == 5
-    # Ela Singh — explicit Recommendation Systems Engineer at Swiggy — should
+    # Ela Singh - explicit Recommendation Systems Engineer at Swiggy - should
     # easily rank #1 against this JD on this sample.
     assert ranked[0].candidate_id == "CAND_0000031"
     assert ranked[0].score >= ranked[1].score

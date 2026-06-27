@@ -1,4 +1,4 @@
-# Redrob × Hack2Skill India Runs — Talentry AI submission metadata
+# Redrob × Hack2Skill India Runs - Talentry AI submission metadata
 team_name: "talentry-ai"
 
 primary_contact:
@@ -33,7 +33,7 @@ ai_tools_used:
 ai_usage_summary: |
   Claude was used as a pair-programmer for architecture brainstorming, code
   review and documentation polish. **No candidate data was ever sent to a
-  hosted LLM** — the entire ranking pipeline runs offline on CPU with zero
+  hosted LLM** - the entire ranking pipeline runs offline on CPU with zero
   network calls (validated in CI).
 
 methodology_summary: |

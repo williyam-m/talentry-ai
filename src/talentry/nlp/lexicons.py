@@ -5,7 +5,7 @@ Everything here is *data*, not logic. We keep it in code (not YAML) because:
 * every value is referenced by a hard-coded module elsewhere, and a typo in
   YAML would only surface at runtime;
 * the lexicon is small enough that auditing it in a PR is trivial;
-* it ships with the wheel — no I/O at startup time.
+* it ships with the wheel - no I/O at startup time.
 
 The lexicons were curated from:
 
@@ -24,7 +24,7 @@ from __future__ import annotations
 # A role family is what we map every `current_title` / `career.title` into so
 # we can compare a candidate's *actual* career arc to the JD's *intended* arc.
 #
-# The JD targets: "Senior AI Engineer — owns the ranking, retrieval and
+# The JD targets: "Senior AI Engineer - owns the ranking, retrieval and
 # matching systems". Role families are ranked from most-aligned (3.0) to
 # definite-disqualifier (-1.0).
 ROLE_FAMILIES: dict[str, dict] = {
@@ -119,7 +119,7 @@ ROLE_KEYWORD_INDEX: dict[str, tuple[str, float]] = {
 # Skills closely tied to the JD's "things you absolutely need" section.
 # Membership in a cluster is worth more than a raw token match because the
 # *evidence* (endorsements + duration_months + assessment score) is what we
-# trust — not the literal string.
+# trust - not the literal string.
 
 SKILL_CLUSTERS: dict[str, list[str]] = {
     "embeddings_retrieval": [
@@ -162,7 +162,7 @@ SKILL_CLUSTERS: dict[str, list[str]] = {
     ],
 }
 
-# JD-derived disqualifier surface — pure CV / robotics specialists.
+# JD-derived disqualifier surface - pure CV / robotics specialists.
 CV_ONLY_SKILLS: frozenset[str] = frozenset(
     {
         "opencv", "yolo", "image classification", "object detection",

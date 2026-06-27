@@ -1,4 +1,4 @@
-# Talentry AI — User Guide
+# Talentry AI - User Guide
 
 Welcome. This guide is for **recruiters and HR teams** who want to use
 Talentry AI to shortlist candidates.
@@ -72,7 +72,7 @@ Every score has six visible components:
 
 If the **final** score is mostly carried by `skill_evidence` but the
 title alignment is near zero, you're looking at someone who knows the
-tech stack but hasn't held the right kind of role — interview risk goes up.
+tech stack but hasn't held the right kind of role - interview risk goes up.
 
 ## 6. Privacy and safety
 

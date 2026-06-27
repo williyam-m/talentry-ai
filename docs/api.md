@@ -1,4 +1,4 @@
-# Talentry AI — HTTP API
+# Talentry AI - HTTP API
 
 The FastAPI server (`talentry-serve` or the bundled HuggingFace Space) exposes
 three endpoints. All payloads are JSON; the only non-JSON response is the
@@ -68,7 +68,7 @@ Run the full ranking pipeline.
       "candidate_id": "CAND_0000031",
       "rank": 1,
       "score": 1.0101,
-      "reasoning": "Strong match — Recommendation Systems Engineer ...",
+      "reasoning": "Strong match - Recommendation Systems Engineer ...",
       "breakdown": {
         "title_alignment": 0.9,
         "semantic_fit": 0.74,

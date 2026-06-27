@@ -19,20 +19,20 @@ def build_text_blob(c: Candidate) -> str:
     """Compose the searchable text used by BM25 / TF-IDF.
 
     We deliberately *upweight* the parts of the profile that the JD says are
-    most signal-bearing — career-history descriptions and the summary — by
+    most signal-bearing - career-history descriptions and the summary - by
     repeating them. BM25 saturates so the duplication just nudges term
     frequency in the right direction without breaking IDF.
     """
     parts: list[str] = [
         c.headline,
-        c.summary, c.summary,  # 2x — JD: read between the lines of the summary
+        c.summary, c.summary,  # 2x - JD: read between the lines of the summary
         c.current_title, c.current_title,
         c.current_industry,
     ]
     for entry in c.career:
         parts.append(entry.title)
         parts.append(entry.description)
-        parts.append(entry.description)  # 2x — career description = where IR/RAG hides
+        parts.append(entry.description)  # 2x - career description = where IR/RAG hides
         parts.append(entry.industry)
     for s in c.skills:
         parts.append(s.name)

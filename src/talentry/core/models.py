@@ -56,7 +56,7 @@ class EducationEntry:
 class Candidate:
     """The flattened view of one record from `candidates.jsonl`.
 
-    Only the fields the ranker actually consumes are materialised — the
+    Only the fields the ranker actually consumes are materialised - the
     rest live in `raw` so that downstream consumers (e.g. the reasoning
     composer) can pull them on demand without us paying for them per row.
     """
@@ -78,7 +78,7 @@ class Candidate:
     signals: dict[str, Any] = field(default_factory=dict)
     raw: dict[str, Any] = field(default_factory=dict)
 
-    # Pre-computed search text — set by the indexing layer.
+    # Pre-computed search text - set by the indexing layer.
     text_blob: str = ""
 
 

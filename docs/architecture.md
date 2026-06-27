@@ -1,8 +1,8 @@
-# Talentry AI — System Architecture
+# Talentry AI - System Architecture
 
 This document is the **engineer's guide** to Talentry AI. If you are reviewing
 the codebase at Stage 3 (reproduction) or Stage 5 (defend-your-work) of the
-Redrob × Hack2Skill — India Runs challenge, start here.
+Redrob × Hack2Skill - India Runs challenge, start here.
 
 ---
 
@@ -21,11 +21,11 @@ imposes a hard envelope on the ranking step:
 
 We additionally treat these *product* requirements as first-class:
 
-* **Explainability** — every score must be defensible at Stage 4 manual review.
-* **Reproducibility** — bit-for-bit reproducibility in a sandboxed Docker.
-* **Anti-trap robustness** — the dataset deliberately contains keyword
+* **Explainability** - every score must be defensible at Stage 4 manual review.
+* **Reproducibility** - bit-for-bit reproducibility in a sandboxed Docker.
+* **Anti-trap robustness** - the dataset deliberately contains keyword
   stuffers, plain-language Tier-5s, behavioural twins, and ~80 honeypots.
-* **No hallucination in reasoning** — every reasoning string must reference
+* **No hallucination in reasoning** - every reasoning string must reference
   only facts present in the candidate's own profile.
 
 ---
@@ -97,7 +97,7 @@ We additionally treat these *product* requirements as first-class:
 
 ## 3. Why not dense embeddings?
 
-Reviewers will rightly ask: "this is a retrieval challenge — why not a
+Reviewers will rightly ask: "this is a retrieval challenge - why not a
 sentence-transformer?" Three reasons:
 
 1. **Budget.** Loading a 90 MB MiniLM and encoding 100K text blobs is right at
@@ -108,7 +108,7 @@ sentence-transformer?" Three reasons:
    thing that can break reproduction; pure BM25 + TF-IDF reproduces from
    `pip install`-able libraries alone.
 3. **Signal saturation.** BM25 saturates on rare-term overlap and TF-IDF
-   smooths over phrasing — and that is exactly what this dataset rewards.
+   smooths over phrasing - and that is exactly what this dataset rewards.
    Adding a dense model marginally improves recall on prose-only profiles
    but adds noise on the keyword surface where stuffers live.
 
@@ -140,13 +140,13 @@ Every constant is grounded in a specific line of the JD; see
 
 * Hot path uses no random state.
 * `reference_date` for behavioural recency is overridable for tests.
-* Sort tie-break: `candidate_id` ascending — matches the validator.
+* Sort tie-break: `candidate_id` ascending - matches the validator.
 * CSV writer enforces the exact validator invariants at write-time so any
   drift fails loudly in the CLI, never silently at upload.
 
 ---
 
-## 6. Threat model — the four traps
+## 6. Threat model - the four traps
 
 | Trap                  | Defence                                                        |
 | --------------------- | -------------------------------------------------------------- |
@@ -162,5 +162,5 @@ Every constant is grounded in a specific line of the JD; see
 * CLI: `python -m talentry.cli.rank ...` (see `make submission`).
 * API: `talentry-serve` (or `make serve`) → `http://localhost:7860`.
 * UI: `make ui-dev` (`http://localhost:5173` with `/api` proxied).
-* Container: `make docker-build && make docker-run` — same image is pushed to
+* Container: `make docker-build && make docker-run` - same image is pushed to
   the HuggingFace Space.

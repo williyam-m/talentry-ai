@@ -2,7 +2,7 @@
 
 The Talentry ranker is built to satisfy the hackathon's *zero-network, ≤5 min,
 CPU-only* budget over 100K candidates. That rules out heavyweight embedding
-models. We therefore lean on a carefully-tuned BM25 + TF-IDF stack — but those
+models. We therefore lean on a carefully-tuned BM25 + TF-IDF stack - but those
 in turn live and die by tokenisation quality on the noisy career-history text.
 
 This module centralises the rules so other components don't disagree.
@@ -14,7 +14,7 @@ import re
 from collections.abc import Iterable
 from functools import lru_cache
 
-# A small, domain-tuned stop-list. We keep it short on purpose — over-aggressive
+# A small, domain-tuned stop-list. We keep it short on purpose - over-aggressive
 # stop-listing makes BM25 score short profiles unfairly.
 _STOPWORDS: frozenset[str] = frozenset(
     {
@@ -35,7 +35,7 @@ _NON_ALPHANUM = re.compile(r"[^a-z0-9+#./\-]+")
 _MULTI_SPACE = re.compile(r"\s+")
 _VERSION_NOISE = re.compile(r"\b\d{4}\b")  # strip year-numbers that explode IDF
 
-# Domain synonyms — collapsed at tokenisation time so BM25 doesn't see
+# Domain synonyms - collapsed at tokenisation time so BM25 doesn't see
 # "ai/ml/AI engineer/machine-learning" as four different terms.
 _SYNONYMS: dict[str, str] = {
     "ai": "ai_ml",

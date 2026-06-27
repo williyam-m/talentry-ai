@@ -71,7 +71,7 @@ def experience_band_score(years: float, jd: JobRequirements) -> float:
     """Triangular score, 1.0 inside [min, max], soft-decaying outside.
 
     The JD literally says "5-9 is a range, not a requirement … we'll seriously
-    consider candidates outside the band if other signals are strong" — hence
+    consider candidates outside the band if other signals are strong" - hence
     the soft decay rather than a hard cutoff.
     """
     lo, hi = jd.min_years, jd.max_years

@@ -67,7 +67,7 @@ def rank_candidates(
         Number of candidates in the final shortlist. The hackathon requires 100.
     reference_date:
         "Today" for behavioural recency calculations. Defaults to the system
-        date — explicitly settable for reproducible tests.
+        date - explicitly settable for reproducible tests.
     progress:
         If True, log a progress message every ~10K candidates.
     """

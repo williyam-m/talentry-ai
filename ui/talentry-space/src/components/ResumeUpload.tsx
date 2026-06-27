@@ -1,7 +1,7 @@
 /**
- * Multi-file résumé uploader.
+ * Multi-file resume uploader.
  *
- * Drops one or many résumés (.pdf, .docx, .txt, .md) onto the page and
+ * Drops one or many resumes (.pdf, .docx, .txt, .md) onto the page and
  * parses them server-side into Redrob-schema-conformant candidate records.
  *
  * The resulting JSON is offered as:
@@ -90,7 +90,7 @@ export const ResumeUpload: React.FC<Props> = ({ onParsed }) => {
           Resume parsing
         </div>
         <h2 className="text-lg sm:text-xl font-semibold text-bone-50 mt-1">
-          Drop résumés — get schema-ready candidate records
+          Drop resumes - get schema-ready candidate records
         </h2>
         <p className="text-xs text-bone-400 mt-2 max-w-2xl">
           PDF · DOCX · TXT · MD. We extract name, headline, summary, career,
@@ -125,8 +125,8 @@ export const ResumeUpload: React.FC<Props> = ({ onParsed }) => {
           </svg>
           <p className="text-sm text-bone-200">
             {isDragActive
-              ? "Drop them — we'll parse instantly"
-              : "Drag résumés here, or click to browse"}
+              ? "Drop them - we'll parse instantly"
+              : "Drag resumes here, or click to browse"}
           </p>
           <p className="text-[11px] text-bone-400 mt-1 font-mono">
             up to 10 MB each · multiple files welcome

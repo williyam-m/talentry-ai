@@ -1,4 +1,4 @@
-"""I/O — candidate loading, submission writing."""
+"""I/O - candidate loading, submission writing."""
 
 from talentry.io.candidates import load_candidates, iter_candidate_records
 from talentry.io.submission import write_submission

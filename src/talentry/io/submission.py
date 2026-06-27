@@ -1,4 +1,4 @@
-"""Submission CSV writer — strictly conforming to `validate_submission.py`.
+"""Submission CSV writer - strictly conforming to `validate_submission.py`.
 
 The official validator (`validate_submission.py`) enforces:
 
@@ -10,7 +10,7 @@ The official validator (`validate_submission.py`) enforces:
 6. Equal-score tie-break: ``candidate_id`` ascending.
 
 We re-implement those invariants here so the writer **cannot** produce a CSV
-the validator would reject — failing loudly at write time is much friendlier
+the validator would reject - failing loudly at write time is much friendlier
 than discovering the problem at upload time.
 """
 
@@ -74,7 +74,7 @@ def write_submission(
     """Validate (when ``strict``) + write the top-K CSV.
 
     ``strict=True`` (the default) enforces every invariant the official
-    ``validate_submission.py`` checks — this is what we use for the real
+    ``validate_submission.py`` checks - this is what we use for the real
     100-row submission. ``strict=False`` is for debugging / smoke runs on
     small samples (e.g. the 50-row fixture) where we just want to inspect
     the shortlist locally.

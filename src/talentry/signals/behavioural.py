@@ -8,7 +8,7 @@ The JD is explicit:
 
 We compute a *multiplier* in [0.55, 1.20] applied on top of the linearly
 combined skill/title/experience scores. We never zero a candidate out on
-behaviour alone — a real recruiter can always call them — but a recruiter who
+behaviour alone - a real recruiter can always call them - but a recruiter who
 won't respond is worth materially less than one who will.
 """
 
@@ -42,7 +42,7 @@ def behavioural_multiplier(
 
     Components, each contributing additively to a base of 1.0 (clipped):
 
-    * Activity recency  — last_active within 60 days bumps, > 180 penalises
+    * Activity recency  - last_active within 60 days bumps, > 180 penalises
     * Recruiter response rate
     * Interview completion rate
     * Open-to-work flag + verified contacts
@@ -68,7 +68,7 @@ def behavioural_multiplier(
     rr = float(signals.get("recruiter_response_rate", 0.0) or 0.0)
     response = (rr - 0.40) * 0.30  # neutral at 40%, +0.18 at 100%, -0.12 at 0%
 
-    # Interview completion — they actually show up.
+    # Interview completion - they actually show up.
     icr = float(signals.get("interview_completion_rate", 0.0) or 0.0)
     interview = (icr - 0.50) * 0.15
 
@@ -93,7 +93,7 @@ def behavioural_multiplier(
     else:
         notice = -0.08
 
-    # Saturated activity bonus — search appearances + saved-by-recruiters say
+    # Saturated activity bonus - search appearances + saved-by-recruiters say
     # the platform's own ranker thinks they're a hot candidate.
     saved = min(float(signals.get("saved_by_recruiters_30d", 0) or 0), 20) / 20.0
     activity_bonus = 0.05 * saved

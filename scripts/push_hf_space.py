@@ -1,4 +1,4 @@
-"""scripts/push_hf_space.py — sync the repo to a HuggingFace Space.
+"""scripts/push_hf_space.py - sync the repo to a HuggingFace Space.
 
 Uses the modern `hf` CLI (already installed as part of huggingface_hub) to:
 
@@ -35,7 +35,7 @@ def main(repo_id: str) -> int:
 
     print(f"→ Target: https://huggingface.co/spaces/{repo_id}")
 
-    # 1. Create the Space (idempotent — `--exist-ok` makes re-runs a no-op).
+    # 1. Create the Space (idempotent - `--exist-ok` makes re-runs a no-op).
     create_cmd = [
         "hf",
         "repos",
@@ -53,7 +53,7 @@ def main(repo_id: str) -> int:
     try:
         run(create_cmd)
     except subprocess.CalledProcessError as e:
-        print(f"(repo create returned {e.returncode} — continuing to upload)")
+        print(f"(repo create returned {e.returncode} - continuing to upload)")
 
     # 2. Stage tracked files into a temp dir.
     with tempfile.TemporaryDirectory(prefix="talentry-hf-") as tmp:

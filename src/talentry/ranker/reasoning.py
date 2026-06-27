@@ -144,7 +144,7 @@ def compose_reasoning(
 
     evidence_phrase = _strongest_evidence(candidate, evidence)
 
-    sentence = f"{label.capitalize()} — {role_phrase}; {evidence_phrase}"
+    sentence = f"{label.capitalize()} - {role_phrase}; {evidence_phrase}"
 
     concerns = _concerns(candidate, evidence, breakdown)
     if concerns:

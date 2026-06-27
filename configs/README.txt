@@ -1,4 +1,4 @@
-Redrob Hackathon — Participant Bundle
+Redrob Hackathon - Participant Bundle
 Welcome to the Intelligent Candidate Discovery & Ranking Challenge.
 
 What's in this bundle
@@ -9,7 +9,7 @@ The 100,000-candidate pool you'll rank. Gzipped JSONL (~52 MB compressed, ~465 M
 sample_candidates.json
 First 50 candidates as pretty-printed JSON. Use this to inspect the schema quickly.
 job_description.md
-The job description you're ranking candidates against. Read it carefully — including the section at the end specifically for hackathon participants.
+The job description you're ranking candidates against. Read it carefully - including the section at the end specifically for hackathon participants.
 submission_spec.md
 Read this in full before starting. Submission format, rules, compute constraints, evaluation stages.
 submission_metadata_template.yaml
@@ -19,17 +19,17 @@ JSON Schema describing every field in a candidate record.
 redrob_signals_doc.md
 Reference for the 23 behavioral signals in each candidate's redrob_signals object. 
 sample_submission.csv
-A format reference. Not a high-quality ranking — just an example of the CSV structure your submission should match.
+A format reference. Not a high-quality ranking - just an example of the CSV structure your submission should match.
 validate_submission.py
 Format validator. Run this on your submission before uploading.
  
 Getting started
 1. Read the docs (~30 minutes)
 In this order:
-1.       job_description.md — understand what role you're ranking candidates for
-2.       submission_spec.md — understand the rules and evaluation pipeline
-3.       redrob_signals_doc.md — understand the trap candidates and signal envelopes
-4.       candidate_schema.json — understand the candidate data structure
+1.       job_description.md - understand what role you're ranking candidates for
+2.       submission_spec.md - understand the rules and evaluation pipeline
+3.       redrob_signals_doc.md - understand the trap candidates and signal envelopes
+4.       candidate_schema.json - understand the candidate data structure
 5.       Open sample_candidates.json and skim a few candidates to see what real data looks like
 2. Unpack the candidate pool
 gunzip -k candidates.jsonl.gz   # -k keeps the .gz; you get both files wc -l candidates.jsonl      # should print 100000
@@ -45,7 +45,7 @@ Submit via the portal. You'll be asked for:
 ·         The CSV file
 ·         All the metadata from submission_metadata_template.yaml (team name, GitHub repo, sandbox link, AI tools declaration, etc.)
 ·         See submission_spec.md Section 10 for the full list
-Sandbox link is required — a working hosted environment (HuggingFace Spaces, Streamlit Cloud, Replit, Colab, Docker, or Binder) where your ranker can be run on a small sample. See Section 10.5 for what counts as a valid sandbox.
+Sandbox link is required - a working hosted environment (HuggingFace Spaces, Streamlit Cloud, Replit, Colab, Docker, or Binder) where your ranker can be run on a small sample. See Section 10.5 for what counts as a valid sandbox.
 Key things to know
 ·         No live leaderboard. Scores are revealed only after submissions close. There is no feedback during the competition.
 ·         Three submissions max. Your last valid submission counts.

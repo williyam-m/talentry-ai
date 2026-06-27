@@ -5,7 +5,7 @@
  *   • Match the editorial dark-mode aesthetic of patronus.ai / scale.com:
  *     a single hero object that morphs / re-positions as the user scrolls
  *     through the guide steps.
- *   • Zero loading state — we render only procedural meshes (no GLTF) so
+ *   • Zero loading state - we render only procedural meshes (no GLTF) so
  *     the very first paint is interactive.
  *   • <60 KB JS gzipped on top of the existing three.js bundle.
  *
@@ -63,7 +63,7 @@ export const Scene3D: React.FC<Props> = ({ step, parallax }) => {
 // ───────────────────────── The hero object ────────────────────────────────
 
 const STEP_CONFIG = [
-  // 0 — Pool of 100k candidates: noisy wireframe sphere.
+  // 0 - Pool of 100k candidates: noisy wireframe sphere.
   {
     geometry: "sphere" as const,
     color: "#9aa9d8",
@@ -72,7 +72,7 @@ const STEP_CONFIG = [
     wire: true,
     distort: 0.35,
   },
-  // 1 — Schema validation: ordered grid plane.
+  // 1 - Schema validation: ordered grid plane.
   {
     geometry: "grid" as const,
     color: "#c1d6c2",
@@ -81,7 +81,7 @@ const STEP_CONFIG = [
     wire: true,
     distort: 0.05,
   },
-  // 2 — Hybrid retrieval (BM25 + TF-IDF + behavioural): torus knot.
+  // 2 - Hybrid retrieval (BM25 + TF-IDF + behavioural): torus knot.
   {
     geometry: "torusKnot" as const,
     color: "#dac3f0",
@@ -90,7 +90,7 @@ const STEP_CONFIG = [
     wire: false,
     distort: 0.18,
   },
-  // 3 — Scoring + reasoning: tight icosahedron.
+  // 3 - Scoring + reasoning: tight icosahedron.
   {
     geometry: "icosa" as const,
     color: "#fafafa",
@@ -99,7 +99,7 @@ const STEP_CONFIG = [
     wire: false,
     distort: 0.0,
   },
-  // 4 — Final shortlist: bright halo ring.
+  // 4 - Final shortlist: bright halo ring.
   {
     geometry: "torus" as const,
     color: "#fafafa",

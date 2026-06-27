@@ -1,4 +1,4 @@
-"""Skill evidence scoring — the anti-keyword-stuffer core of the ranker.
+"""Skill evidence scoring - the anti-keyword-stuffer core of the ranker.
 
 Why is this a separate module?
 
@@ -59,7 +59,7 @@ class SkillEvidence:
 
     @property
     def overall(self) -> float:
-        """Mean of cluster scores — a fast scalar summary."""
+        """Mean of cluster scores - a fast scalar summary."""
         if not self.cluster_scores:
             return 0.0
         return sum(self.cluster_scores.values()) / len(self.cluster_scores)
@@ -159,7 +159,7 @@ def score_skill_evidence(c: Candidate, must_have: list[str]) -> SkillEvidence:
         target = min(len(SKILL_CLUSTERS[cluster_name]), 4)
         cluster_scores[cluster_name] = min(1.0, total / target) if target else 0.0
 
-    # Must-have hit / miss diagnostics (free strings — used by the reasoning
+    # Must-have hit / miss diagnostics (free strings - used by the reasoning
     # composer).
     must_hits: list[str] = []
     must_misses: list[str] = []

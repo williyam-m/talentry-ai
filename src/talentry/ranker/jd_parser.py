@@ -99,15 +99,15 @@ def parse_job_description(jd: str | Path | None = None) -> JobRequirements:
     else:
         min_y, max_y = 5.0, 9.0
 
-    # Title — first line that looks like a title.
+    # Title - first line that looks like a title.
     title = "Senior AI Engineer"
     for line in text.splitlines():
         line = line.strip()
         if line.lower().startswith("job description") and ":" in line:
-            title = line.split(":", 1)[1].strip().split("—")[0].strip()
+            title = line.split(":", 1)[1].strip().split("-")[0].strip()
             break
 
-    # Seniority bucket — we hard-bias to "senior" for this JD but parse the
+    # Seniority bucket - we hard-bias to "senior" for this JD but parse the
     # word for future generality.
     if "principal" in lower or "staff" in lower:
         seniority = "staff+"
@@ -146,7 +146,7 @@ def parse_job_description(jd: str | Path | None = None) -> JobRequirements:
 
 
 # A compact fallback so the package is usable even without the JD file.
-_DEFAULT_JD_TEXT = """Job Description: Senior AI Engineer — Founding Team
+_DEFAULT_JD_TEXT = """Job Description: Senior AI Engineer - Founding Team
 Company: Redrob AI (Series A AI-native talent intelligence platform)
 Location: Pune/Noida, India (Hybrid). Open to Tier-1 Indian cities.
 Experience Required: 5–9 years.

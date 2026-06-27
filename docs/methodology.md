@@ -1,4 +1,4 @@
-# Talentry AI — Methodology
+# Talentry AI - Methodology
 
 This is the document a **Stage-4 reviewer** should read. Every modelling
 decision is justified against a specific line of
@@ -16,7 +16,7 @@ The JD explicitly closes with:
 > the dataset. … A candidate who has all the AI keywords listed as skills but
 > whose title is 'Marketing Manager' is not a fit, no matter how perfect
 > their skill list looks. … Your ranking system should also weigh behavioural
-> signals — a perfect-on-paper candidate who hasn't logged in for 6 months
+> signals - a perfect-on-paper candidate who hasn't logged in for 6 months
 > and has a 5% recruiter response rate is, for hiring purposes, not actually
 > available. Down-weight them appropriately.
 
@@ -46,8 +46,8 @@ Two trajectory amplifiers:
 
 A hybrid retrieval score combining:
 
-* **BM25** (60%) — rare-term overlap; e.g. "FAISS", "RAG", "NDCG".
-* **TF-IDF cosine** (40%) — topical similarity that smooths over phrasing
+* **BM25** (60%) - rare-term overlap; e.g. "FAISS", "RAG", "NDCG".
+* **TF-IDF cosine** (40%) - topical similarity that smooths over phrasing
   differences ("retrieval", "search", "ranking" should cluster together).
 
 We min-max normalise each to [0,1] before combining so the two stay
@@ -55,7 +55,7 @@ comparable across query lengths.
 
 Why no dense embeddings? See [`architecture.md` §3](architecture.md#3-why-not-dense-embeddings).
 
-### 2.3 Skill evidence (weight 0.28) — the anti-stuffer core
+### 2.3 Skill evidence (weight 0.28) - the anti-stuffer core
 
 Each claimed skill gets a **trust score** in [0, 1]:
 
@@ -69,17 +69,17 @@ trust = 0.40·proficiency + 0.20·endorsements + 0.10·duration + 0.30·assessme
 * Endorsements saturate at 50 (per dataset max ≈ 60).
 * Duration saturates at 36 months.
 
-Trust scores are then aggregated per **skill cluster** (six clusters —
+Trust scores are then aggregated per **skill cluster** (six clusters -
 `embeddings_retrieval`, `ranking_recsys`, `nlp_llm`, `ml_core`,
 `python_engineering`, `data_engineering`) normalised to [0,1] by dividing by
 `min(cluster_size, 4)`.
 
-A stuffer signal — `keyword_stuff_ratio` — counts AI-keyword surface claims
+A stuffer signal - `keyword_stuff_ratio` - counts AI-keyword surface claims
 that look padded (advanced/expert + ≤2 endorsements + ≤6 months + no
 assessment, *or* trust < 0.40). When the ratio ≥ 0.7 the cluster sum is
 discounted by 35%.
 
-A CV/speech dominance signal — if ≥ 55% of total trust is in CV-only or
+A CV/speech dominance signal - if ≥ 55% of total trust is in CV-only or
 speech-only skills, the cluster sum is discounted by 45% (JD: *"primary
 expertise is computer vision, speech, or robotics … you'd be re-learning
 fundamentals here"*).
@@ -88,7 +88,7 @@ fundamentals here"*).
 
 Triangular score, `1.0` inside `[min_years, max_years]`, soft-decaying
 outside. The JD: *"5-9 is a range, not a requirement … we'll seriously
-consider candidates outside the band if other signals are strong"* — hence
+consider candidates outside the band if other signals are strong"* - hence
 the soft decay rather than a hard cutoff.
 
 ### 2.5 Location (weight 0.06)
@@ -135,19 +135,19 @@ Honeypot penalty (subtracted, capped at 0.50):
 the candidate's profile. The structure is:
 
 ```
-"<tone-phrase> — <role + years + location>; <strongest evidence>. Concerns: <…>."
+"<tone-phrase> - <role + years + location>; <strongest evidence>. Concerns: <…>."
 ```
 
 The "strongest evidence" span is picked by preference order:
 
 1. A career-history description that mentions
    retrieval / ranking / embedding / search / recommendation / RAG / vector
-   / FAISS / Elasticsearch / LTR — *quoted with company name + tenure*.
+   / FAISS / Elasticsearch / LTR - *quoted with company name + tenure*.
 2. The strongest skill cluster (only if ≥ 0.40 and not the AI-keyword surface).
 3. A top assessed skill (proficiency + duration + assessment score).
 4. Fallback: current title + employer.
 
-Concerns are emitted *only when present* — long notice, low activity,
+Concerns are emitted *only when present* - long notice, low activity,
 stuffer profile, CV/speech dominance, consulting-only career, or honeypot
 suspicion. Each concern phrase quotes a real numeric fact (e.g.
 `"long notice 120d"`).

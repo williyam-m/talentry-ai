@@ -1,13 +1,13 @@
 """Hybrid lexical-semantic similarity between JD text and candidate text blobs.
 
-We use TF-IDF + BM25 — *not* dense embeddings — because:
+We use TF-IDF + BM25 - *not* dense embeddings - because:
 
 * The challenge caps us at ≤ 5 minutes CPU / no network for 100K candidates,
   so loading a 90 MB sentence-transformer + encoding 100K text blobs is right
   at the edge of the budget and adds a meaningful dependency risk to Stage 3
   reproduction.
 * For a single JD vs many candidates, BM25 is essentially the strongest
-  classical baseline and is *robust to short, noisy text* — exactly what
+  classical baseline and is *robust to short, noisy text* - exactly what
   career-history descriptions are.
 * The combination of BM25 + a smaller TF-IDF cosine acts as a poor man's
   "hybrid retrieval" and captures both rare-term overlap and overall topical
@@ -47,7 +47,7 @@ class SemanticIndex:
         else:
             bm25_norm = bm25_scores
 
-        # TF-IDF cosine — JD vs all candidate blobs.
+        # TF-IDF cosine - JD vs all candidate blobs.
         jd_vec = self.tfidf.transform([" ".join(jd_tokens)])
         # cosine = (A . B) / (|A||B|); TfidfVectorizer rows are L2-normalised
         # already, so dot product == cosine.

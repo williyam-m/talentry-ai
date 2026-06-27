@@ -1,5 +1,5 @@
 
-Redrob Behavioral Signals — Reference
+Redrob Behavioral Signals - Reference
 This document explains the 23 behavioral signals embedded in each candidate's redrob_signals object, how they relate to candidate quality, and how they're constructed in the synthetic dataset.
 
 What are Redrob signals?

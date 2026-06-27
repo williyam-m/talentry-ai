@@ -1,11 +1,11 @@
-"""``talentry-rank`` — the one command that produces the submission CSV.
+"""``talentry-rank`` - the one command that produces the submission CSV.
 
 This is the entry point pinned in ``submission_metadata.yaml``'s
 ``reproduce_command`` field:
 
     python -m talentry.cli.rank --candidates ./candidates.jsonl --out ./submission.csv
 
-The command is deliberately tiny — all the engineering lives in the package,
+The command is deliberately tiny - all the engineering lives in the package,
 and this file just argparses, dispatches and reports.
 """
 
@@ -85,7 +85,7 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     jd = parse_job_description(args.jd)
-    log.info("[talentry-rank] JD parsed — title=%r seniority=%s", jd.title, jd.seniority)
+    log.info("[talentry-rank] JD parsed - title=%r seniority=%s", jd.title, jd.seniority)
 
     ranked = rank_candidates(candidates, jd, top_k=args.top_k, progress=not args.quiet)
     if len(ranked) < args.top_k:

@@ -1,4 +1,4 @@
-"""End-to-end ranker — exposes a single :func:`rank_candidates` entry point."""
+"""End-to-end ranker - exposes a single :func:`rank_candidates` entry point."""
 
 from talentry.ranker.jd_parser import parse_job_description
 from talentry.ranker.engine import rank_candidates

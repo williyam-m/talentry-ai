@@ -1,4 +1,4 @@
-"""Honeypot detection — additive penalty in [0, 0.5].
+"""Honeypot detection - additive penalty in [0, 0.5].
 
 From `submission_spec` §7:
 
@@ -7,7 +7,7 @@ From `submission_spec` §7:
     founded 3 years ago; 'expert' proficiency in 10 skills with 0 years used).
     These are forced to relevance tier 0 in the ground truth.
 
-We don't try to label them perfectly — we just don't want them in the top-10
+We don't try to label them perfectly - we just don't want them in the top-10
 (which would also disqualify us via the 10% honeypot rate filter at Stage 3).
 The penalty is **additive** (not a multiplier), so it can knock a top-shelf
 score off the leaderboard.
@@ -70,7 +70,7 @@ def honeypot_score(c: Candidate) -> float:
         pass
 
     # 5. is_current=True on a role whose start_date is in the future relative
-    # to all education end years — weak signal but cheap.
+    # to all education end years - weak signal but cheap.
     cur_starts = [_parse_year(r.start_date) for r in c.career if r.is_current]
     edu_ends = [e.end_year for e in c.education if e.end_year]
     if cur_starts and edu_ends and max(edu_ends) > max(filter(None, cur_starts or [0]), default=0) + 1:
