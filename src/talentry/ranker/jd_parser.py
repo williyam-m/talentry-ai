@@ -99,14 +99,50 @@ def _read(jd: str | Path | None) -> str:
 
 
 
+def _extract_skills_from_section(text: str, section_markers: list[str], stop_markers: list[str]) -> list[str]:
+    """Scan `text` for any of the seed skills appearing in the named section.
+
+    Sections are matched case-insensitively. We take everything between the
+    first ``section_marker`` line and the next ``stop_marker`` line (or EOF),
+    then intersect with our domain skill vocabulary so we only return skills
+    we know how to score downstream.
+    """
+    lower = text.lower()
+    start = -1
+    for marker in section_markers:
+        idx = lower.find(marker.lower())
+        if idx >= 0 and (start == -1 or idx < start):
+            start = idx
+    if start < 0:
+        return []
+    rest = lower[start:]
+    end = len(rest)
+    for marker in stop_markers:
+        idx = rest.find(marker.lower(), 1)
+        if 0 < idx < end:
+            end = idx
+    body = rest[:end]
+    pool = set(_MUST_HAVE_SEED + _NICE_TO_HAVE_SEED + _DISQUALIFIER_SEED)
+    found: list[str] = []
+    for skill in sorted(pool, key=lambda s: (-len(s), s)):
+        if skill.lower() in body and skill not in found:
+            found.append(skill)
+    return found
+
+
 def parse_job_description(jd: str | Path | None = None) -> JobRequirements:
     """Parse a free-text JD into :class:`JobRequirements`.
 
     When called with ``None`` the bundled Senior-AI-Engineer JD text is used,
     so the API and CLI can be invoked without a JD file in trivial demos.
+
+    Skill lists (must / nice / disqualifier) are extracted from the
+    *uploaded* JD when possible — the hardcoded seeds are only the
+    vocabulary we know how to score, not a fixed answer key.
     """
     text = _read(jd)
     lower = text.lower()
+
 
     # Years band
     match = _YEARS_RE.search(text)
@@ -137,15 +173,34 @@ def parse_job_description(jd: str | Path | None = None) -> JobRequirements:
     notice_match = _NOTICE_RE.search(text)
     pref_notice = int(notice_match.group(2) or notice_match.group(3)) if notice_match else 30
 
+    # Skills: try to extract from the uploaded JD; fall back to seeds if
+    # the JD doesn't use the expected section headers.
+    must_have = _extract_skills_from_section(
+        text,
+        section_markers=["must have", "must-have", "requirements", "what you'll do", "qualifications", "you have"],
+        stop_markers=["nice to have", "nice-to-have", "preferred", "bonus", "do not want", "we offer", "benefits"],
+    ) or _MUST_HAVE_SEED
+    nice_have = _extract_skills_from_section(
+        text,
+        section_markers=["nice to have", "nice-to-have", "preferred", "bonus", "good to have"],
+        stop_markers=["do not want", "we offer", "benefits", "about us", "what we offer"],
+    ) or _NICE_TO_HAVE_SEED
+    disqualifiers = _extract_skills_from_section(
+        text,
+        section_markers=["do not want", "do not", "disqualif", "we will not"],
+        stop_markers=["we offer", "benefits", "about us"],
+    ) or _DISQUALIFIER_SEED
+
     return JobRequirements(
         title=title,
         role_family="ml_engineer",
         seniority=seniority,
         min_years=min_y,
         max_years=max_y,
-        must_have_skills=_MUST_HAVE_SEED,
-        nice_to_have_skills=_NICE_TO_HAVE_SEED,
-        disqualifier_skills=_DISQUALIFIER_SEED,
+        must_have_skills=must_have,
+        nice_to_have_skills=nice_have,
+        disqualifier_skills=disqualifiers,
+
         preferred_locations=sorted(PREFERRED_LOCATIONS),
         relocation_friendly_locations=sorted(TIER1_INDIA_LOCATIONS),
         preferred_notice_days=pref_notice,
