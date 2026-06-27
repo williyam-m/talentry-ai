@@ -1,6 +1,7 @@
 /**
- * GitHub-like green/red diff between an uploaded record and the official
+ * Git diff style report between an uploaded record and the official
  * Redrob `candidate_schema.json`.
+
  *
  * Visual contract:
  *   • `match`  → neutral grey line.
