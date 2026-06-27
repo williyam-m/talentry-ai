@@ -4,24 +4,40 @@
 # Mirror the current repo to a HuggingFace Space, prepending the YAML metadata
 # header HF requires at the top of the Space README.
 #
-# Usage:   scripts/push_hf_space.sh <hf-username>/<space-name>
+# Usage:   scripts/push_hf_space.sh <hf-username>/<space-name> [<hf-username>]
 # Example: scripts/push_hf_space.sh williyam/talentry-ai
+#          scripts/push_hf_space.sh williyam/talentry-ai myuser
 #
-# Requires: `huggingface-cli login` already done, or HF_TOKEN env var set.
+# Auth:    Either `huggingface-cli login` first, OR set HF_TOKEN env var.
 # ──────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 
-REPO_ID="${1:?usage: push_hf_space.sh <user>/<space>}"
+REPO_ID="${1:?usage: push_hf_space.sh <user>/<space> [<hf-username>]}"
+HF_USER="${2:-${REPO_ID%%/*}}"
 HF_URL="https://huggingface.co/spaces/${REPO_ID}"
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
+# Resolve an HF token from either env var or the CLI's cached login.
+HF_TOKEN="${HF_TOKEN:-}"
+if [[ -z "${HF_TOKEN}" ]]; then
+  if command -v huggingface-cli >/dev/null 2>&1; then
+    HF_TOKEN="$(huggingface-cli whoami --token 2>/dev/null || true)"
+  fi
+  if [[ -z "${HF_TOKEN}" && -f "${HOME}/.cache/huggingface/token" ]]; then
+    HF_TOKEN="$(cat "${HOME}/.cache/huggingface/token")"
+  fi
+fi
+if [[ -z "${HF_TOKEN}" ]]; then
+  echo "⚠️  No HF_TOKEN found. Run 'huggingface-cli login' or export HF_TOKEN."
+  exit 1
+fi
+
 TMP="$(mktemp -d -t talentry-hf.XXXXXX)"
 trap 'rm -rf "$TMP"' EXIT
 
-echo "→ Mirroring $ROOT to $TMP"
-# Use `git ls-files` to copy only tracked files (skips .venv, node_modules, dist…)
+echo "→ Mirroring $ROOT to $TMP (tracked files only)"
 git ls-files | rsync -a --files-from=- "$ROOT/" "$TMP/"
 
 echo "→ Prepending HF Space YAML header to README.md"
@@ -32,10 +48,11 @@ git init -q -b main
 git remote add origin "$HF_URL"
 git lfs install --skip-repo 2>/dev/null || true
 
-# If the space already exists, fetch its current HEAD so our push is fast-forward.
-if git ls-remote --exit-code "$HF_URL" main >/dev/null 2>&1; then
+PUSH_URL="https://${HF_USER}:${HF_TOKEN}@huggingface.co/spaces/${REPO_ID}"
+
+if git ls-remote --exit-code "$PUSH_URL" main >/dev/null 2>&1; then
   echo "→ Space exists, fetching current main"
-  git fetch -q origin main
+  git fetch -q "$PUSH_URL" main
   git reset -q --soft FETCH_HEAD
 fi
 
@@ -46,11 +63,6 @@ if [[ -n "$(git status --porcelain)" ]]; then
 fi
 
 echo "→ Pushing to $HF_URL (main)"
-if [[ -n "${HF_TOKEN:-}" ]]; then
-  # Auth via token (CI-friendly).
-  git push -q "https://williyam:${HF_TOKEN}@huggingface.co/spaces/${REPO_ID}" HEAD:main
-else
-  git push -q origin HEAD:main
-fi
+git push -q "$PUSH_URL" HEAD:main
 
 echo "✅ Pushed. Open: $HF_URL"
