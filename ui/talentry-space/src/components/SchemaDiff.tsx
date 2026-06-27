@@ -103,7 +103,7 @@ const ErrorList: React.FC<{ errors: SchemaErrorItem[] }> = ({ errors }) => {
   if (!errors.length)
     return <p className="text-sm text-emerald-300">No schema errors. ✓</p>;
   return (
-    <ul className="space-y-2 max-h-[50vh] overflow-auto custom-scroll pr-1">
+    <ul className="space-y-2 max-h-[50vh] overflow-auto custom-scroll pr-1 overscroll-contain" data-lenis-prevent>
       {errors.map((e, i) => (
         <li
           key={i}
@@ -157,7 +157,7 @@ const FieldDiff: React.FC<{ lines: DiffLine[] }> = ({ lines }) => {
     [lines]
   );
   return (
-    <div className="max-h-[55vh] overflow-auto custom-scroll border border-red-500/20 rounded bg-ink-950/70 font-mono text-[12px] leading-relaxed">
+    <div className="max-h-[55vh] overflow-auto custom-scroll border border-red-500/20 rounded bg-ink-950/70 font-mono text-[12px] leading-relaxed overscroll-contain" data-lenis-prevent>
       {sorted.map((line, i) => (
         <DiffRow key={i} line={line} />
       ))}
@@ -218,7 +218,7 @@ const RawDiff: React.FC<{ expected: unknown; actual: unknown }> = ({
 }) => {
   const parts = useMemo(() => diffJson(expected ?? {}, actual ?? {}), [expected, actual]);
   return (
-    <pre className="max-h-[55vh] overflow-auto custom-scroll text-[11.5px] leading-snug font-mono bg-ink-950/70 border border-red-500/20 rounded p-3">
+    <pre className="max-h-[55vh] overflow-auto custom-scroll text-[11.5px] leading-snug font-mono bg-ink-950/70 border border-red-500/20 rounded p-3 overscroll-contain" data-lenis-prevent>
       {parts.map((part, i) => {
         const cls = part.added
           ? "bg-emerald-500/10 text-emerald-100"
