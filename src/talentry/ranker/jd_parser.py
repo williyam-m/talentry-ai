@@ -79,23 +79,43 @@ def _read(jd: str | Path | None) -> str:
     """Read JD source. Accepts a Path / path-like / raw string.
 
     File formats supported: .txt, .md, .docx, .pdf. Anything else is read
-    as UTF-8 text. A raw string is returned as-is.
+    as UTF-8 text. A raw string that does not name an existing file is
+    returned as-is (this is how the API passes already-extracted text in,
+    e.g. after decoding a .docx upload).
     """
     if jd is None:
         return _DEFAULT_JD_TEXT
-    if isinstance(jd, Path) or (isinstance(jd, str) and Path(jd).exists()):
-        path = Path(jd)
-        suffix = path.suffix.lower()
-        if suffix == ".docx":
-            from talentry.io.resume import _extract_docx
-            return _extract_docx(path.read_bytes())
-        if suffix == ".pdf":
-            from talentry.io.resume import _extract_pdf
-            return _extract_pdf(path.read_bytes())
-        # Plain text — be permissive about encoding (the bundled JD ships
-        # as UTF-8 but uploads may be cp1252 / latin-1).
-        return path.read_text(encoding="utf-8", errors="replace")
+    if isinstance(jd, Path):
+        return _read_path(jd)
+    if isinstance(jd, str):
+        # Only treat the string as a path if it's short enough to be one and
+        # actually points at an existing file. Long blobs of JD prose blow
+        # past the OS filename limit and would raise ENAMETOOLONG inside
+        # Path(jd).exists() — that's how the server was returning HTTP 500
+        # whenever an uploaded .docx was decoded to a multi-KB string.
+        if len(jd) < 1024 and "\n" not in jd:
+            try:
+                p = Path(jd)
+                if p.exists():
+                    return _read_path(p)
+            except OSError:
+                pass
+        return jd
     return str(jd)
+
+
+def _read_path(path: Path) -> str:
+    suffix = path.suffix.lower()
+    if suffix == ".docx":
+        from talentry.io.resume import _extract_docx
+        return _extract_docx(path.read_bytes())
+    if suffix == ".pdf":
+        from talentry.io.resume import _extract_pdf
+        return _extract_pdf(path.read_bytes())
+    # Plain text — be permissive about encoding (the bundled JD ships
+    # as UTF-8 but uploads may be cp1252 / latin-1).
+    return path.read_text(encoding="utf-8", errors="replace")
+
 
 
 
@@ -139,8 +159,21 @@ def parse_job_description(jd: str | Path | None = None) -> JobRequirements:
     Skill lists (must / nice / disqualifier) are extracted from the
     *uploaded* JD when possible — the hardcoded seeds are only the
     vocabulary we know how to score, not a fixed answer key.
+
+    IMPORTANT: when the caller provides a non-empty ``jd`` (string, Path,
+    or already-extracted text), we treat it as the authoritative source.
+    The default Senior-AI-Engineer JD is only used when ``jd is None`` or
+    when the supplied text is blank. This guarantees the API/UI cannot
+    silently fall back to the bundled JD after a user uploaded their own.
     """
+    # Was the JD supplied by the caller (uploaded) vs. defaulted?
+    caller_supplied = jd is not None and (not isinstance(jd, str) or jd.strip() != "")
     text = _read(jd)
+    if not text.strip():
+        # Pathological case: the upload decoded to whitespace. Fall back
+        # to the bundled JD rather than producing an empty parse.
+        text = _DEFAULT_JD_TEXT
+        caller_supplied = False
     lower = text.lower()
 
 
