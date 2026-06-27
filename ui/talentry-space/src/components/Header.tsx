@@ -32,6 +32,12 @@ export const Header: React.FC<{ version?: string }> = ({ version }) => {
         </a>
         <nav className="flex items-center gap-3 sm:gap-5 text-[11px] uppercase tracking-widest text-bone-300">
           <a
+            className="hidden sm:inline relative hover:text-bone-50 transition-colors after:absolute after:left-0 after:-bottom-1 after:h-px after:w-0 after:bg-bone-50 after:transition-all hover:after:w-full"
+            href="#how-it-works"
+          >
+            How it works
+          </a>
+          <a
             className="relative hover:text-bone-50 transition-colors after:absolute after:left-0 after:-bottom-1 after:h-px after:w-0 after:bg-bone-50 after:transition-all hover:after:w-full"
             href="https://github.com/williyam-m/talentry-ai"
             target="_blank"
