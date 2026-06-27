@@ -5,7 +5,7 @@
  *     production behind the FastAPI static mount);
  *   • parse `application/json` *and* the FastAPI `{detail: ...}` error shape;
  *   • surface schema-validation failures (HTTP 422 from /api/rank) as a
- *     structured object — the UI uses this to render a git diff style
+ *     structured object - the UI uses this to render a git diff style
  *     report instead of a generic "request failed" toast.
 
  */
@@ -133,7 +133,8 @@ export async function postRank(opts: RankOptions): Promise<RankResponse> {
   const res = await _fetch(url, {
     method: "POST",
     body: fd,
-    timeoutMs: 5 * 60_000, // ranking the full 100k pool can take ~90 s
+    timeoutMs: 15 * 60_000, // ranking the full 100k pool can take ~90 s
+
   });
   if (res.status === 422) {
     const body = (await res.json().catch(() => null)) as RankErrorResponse | null;
@@ -161,7 +162,7 @@ export async function postValidate(opts: {
 }
 
 export async function postParseResumes(files: File[]): Promise<ParseResumesResponse> {
-  if (!files.length) throw new ApiError("no résumé files supplied", 400);
+  if (!files.length) throw new ApiError("no resume files supplied", 400);
   const fd = new FormData();
   for (const f of files) fd.append("files", f);
   const res = await _fetch(`${BASE}/api/parse-resumes`, {
