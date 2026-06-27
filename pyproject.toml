@@ -27,7 +27,10 @@ dependencies = [
   "orjson>=3.9",
   # Resume parsing — keeps the wheel tiny (no native deps).
   "pypdf>=4.3",
+  # XLSX submission writer (the hackathon spec accepts CSV or XLSX).
+  "openpyxl>=3.1",
 ]
+
 
 [project.optional-dependencies]
 api = ["fastapi>=0.110", "uvicorn[standard]>=0.27", "python-multipart>=0.0.9"]
