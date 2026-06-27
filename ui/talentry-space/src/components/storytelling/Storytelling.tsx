@@ -1,21 +1,24 @@
 /**
  * Immersive, scroll-triggered storytelling section.
  *
- * Layout:
- *   • A 100vh sticky panel on the right (≥ md) holding the 3D <Scene3D/>.
- *   • A stack of 5 narrative "steps" on the left, each ~80vh tall.
- *     As the user scrolls, an IntersectionObserver promotes one step at a
- *     time to `active`; the active step drives:
- *       - Scene3D `step` prop (geometry / colour morph)
- *       - the floating "tech stack" caption block on top-right
- *       - per-step framer-motion enter animations
+ * Layout
+ * ──────
+ * A single CSS grid with two columns (≥ md):
+ *   • LEFT  → vertical stack of N narrative "steps", each ~ a screen tall.
+ *   • RIGHT → ONE element whose `position: sticky` pins it to the viewport
+ *             while the user scrolls through the left-hand steps. That
+ *             element hosts the <Scene3D/> + a per-step caption overlay.
  *
- * Strategic-storytelling references in the brief: patronus.ai, scale.com.
- * Both ship one sticky hero canvas + scrolling text alongside; we replicate
- * that pattern with our own ranking pipeline narrative.
+ * IMPORTANT: `position: sticky` only works while inside the grid container.
+ * Once the user scrolls past the last step, the sticky element naturally
+ * "unpins" — which is the correct behaviour (the 3D scene exits with the
+ * section instead of overlaying the rest of the page).
+ *
+ * The active step is driven by an IntersectionObserver biased toward the
+ * centre of the viewport, mirroring the patronus.ai / scale.com pattern.
  */
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Scene3D } from "./Scene3D";
 
@@ -32,52 +35,54 @@ const STEPS: StoryStep[] = [
   {
     id: "ingest",
     kicker: "01 · Ingest",
-    title: "100,000 candidates — streamed, not loaded",
+    title: "Stream 100K candidates at line-rate",
     body:
-      "We ingest JSONL/JSON/JSONL.gz at line-rate with a zero-copy streaming loader. " +
-      "Each record is normalised into a slotted Python dataclass that mirrors the " +
-      "official Redrob schema 1:1 — so the rest of the pipeline never re-reads raw JSON.",
-    stack: ["orjson", "gzip streaming", "Python dataclasses (slots)", "candidate_schema.json"],
+      "A zero-copy streaming loader pulls JSONL / JSON / JSONL.gz off disk one " +
+      "record at a time and normalises each into a slotted Python dataclass mirroring " +
+      "the official Redrob schema 1:1, so downstream stages never re-parse raw JSON.",
+    stack: ["orjson", "gzip streaming", "Python dataclasses (slots)", "schema-aligned DTOs"],
   },
   {
     id: "validate",
     kicker: "02 · Validate",
-    title: "Schema-first — green/red diff before a single token is scored",
+    title: "Schema-first — git diff style report before scoring",
     body:
       "Every record is checked against a focused draft-07 JSON-Schema validator. " +
-      "Mismatches are surfaced as a GitHub-style diff: red lines for missing required " +
-      "fields, green for fields the schema doesn't declare. Bad data never reaches the ranker.",
-    stack: ["JSON-Schema (draft-07)", "deterministic walker", "GitHub-style diff", "fail-fast"],
+      "Mismatches are surfaced as a git diff style report — added / removed / changed " +
+      "lines for missing required fields, unknown fields, and enum / type violations. " +
+      "Bad data is rejected before any token is scored.",
+    stack: ["JSON-Schema (draft-07)", "deterministic walker", "git diff style report", "fail-fast contract"],
   },
   {
     id: "understand",
     kicker: "03 · Understand the JD",
-    title: "Hybrid retrieval, not keyword bingo",
+    title: "Hybrid retrieval — not keyword bingo",
     body:
-      "The Job Description is parsed into a structured JobRequirements object " +
-      "(role family, seniority, must/nice-have skills). Candidates are then scored " +
-      "with a hybrid of BM25 + TF-IDF + role-keyword evidence — so a senior who writes " +
-      '"I built distributed training on 8×A100" beats a keyword stuffer claiming "PyTorch expert".',
-    stack: ["rank_bm25", "scikit-learn TF-IDF", "role lexicon", "RapidFuzz"],
+      "The Job Description is parsed into a structured JobRequirements DTO " +
+      "(role family, seniority band, must / nice-have / disqualifier skills). " +
+      "Candidates are scored with a hybrid of BM25 + TF-IDF + role-lexicon evidence — " +
+      "a senior who writes \"I built distributed training on 8×A100\" outranks the " +
+      '"PyTorch expert" who just stuffed the skill list.',
+    stack: ["rank_bm25", "scikit-learn TF-IDF", "role lexicon graph", "RapidFuzz fuzzy match"],
   },
   {
     id: "signals",
     kicker: "04 · Behavioural signals",
     title: "Reading between the lines",
     body:
-      "Profile completeness, response-rate, search-appearance, GitHub activity, " +
-      "honeypot detectors — all combined into multiplicative & subtractive modifiers. " +
-      "Inactive paper-perfect candidates get penalised; verified, responsive, active " +
-      "ones get rewarded.",
-    stack: ["custom signal lexicon", "honeypot rules", "behavioural priors"],
+      "Profile completeness, response rate, search appearance, GitHub activity, " +
+      "endorsement trust and honeypot detectors combine into multiplicative and " +
+      "subtractive modifiers. Inactive paper-perfect profiles get penalised; " +
+      "verified, responsive, active candidates get rewarded.",
+    stack: ["custom signal lexicon", "honeypot rules", "behavioural priors", "endorsement trust"],
   },
   {
     id: "ship",
     kicker: "05 · Ship",
-    title: "Explainable shortlist + CSV in <90 s on a laptop",
+    title: "Explainable shortlist + validator-clean CSV",
     body:
       "The final top-K is materialised with a per-candidate score breakdown and a " +
-      "natural-language reasoning line. The same payload is also written to a " +
+      "natural-language justification. The same payload is also written to a " +
       "validator-clean submission.csv served via /api/submission.csv?session=…",
     stack: ["FastAPI", "GZip middleware", "LRU result cache", "validator-clean CSV"],
   },
@@ -88,12 +93,12 @@ export const Storytelling: React.FC = () => {
   const [parallax, setParallax] = useState({ x: 0, y: 0 });
   const stepRefs = useRef<(HTMLElement | null)[]>([]);
 
+  // ── Drive `active` from intersection with the viewport's middle band ──
   useEffect(() => {
     const els = stepRefs.current.filter(Boolean) as HTMLElement[];
     if (!els.length) return;
     const io = new IntersectionObserver(
       (entries) => {
-        // Pick the entry with greatest intersectionRatio that is currently visible.
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
@@ -102,16 +107,13 @@ export const Storytelling: React.FC = () => {
           if (!Number.isNaN(idx)) setActive(idx);
         }
       },
-      {
-        // Bias the observer toward the centre of the viewport.
-        rootMargin: "-30% 0px -40% 0px",
-        threshold: [0.25, 0.5, 0.75],
-      }
+      { rootMargin: "-35% 0px -40% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] }
     );
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
   }, []);
 
+  // ── Mouse parallax for the 3D scene ──────────────────────────────────
   useEffect(() => {
     function onMove(e: MouseEvent) {
       setParallax({
@@ -127,37 +129,62 @@ export const Storytelling: React.FC = () => {
 
   return (
     <section id="how-it-works" className="relative">
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        {/* ── Section intro ─────────────────────────────────────────── */}
         <div className="mb-10 md:mb-16 reveal">
           <div className="inline-flex items-center gap-2 pill border-bone-400/40 text-bone-300 bg-bone-50/5">
             <span className="w-1.5 h-1.5 rounded-full bg-bone-50 animate-pulse" />
             How Talentry works
           </div>
           <h2 className="mt-4 text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight bg-gradient-to-br from-bone-50 via-bone-100 to-bone-400 bg-clip-text text-transparent max-w-3xl">
-            From 100,000 résumés to a defensible shortlist — every step, explained.
+            From 100,000 résumés to a defensible shortlist — every stage, instrumented.
           </h2>
           <p className="mt-4 text-bone-300 text-sm sm:text-base max-w-2xl">
             Scroll to walk through the pipeline. The geometry on the right
-            reshapes itself as the candidate pool gets refined.
+            reshapes itself as the candidate pool is refined.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-          {/* Left: scrolling steps */}
-          <ol className="relative space-y-[55vh] pb-[50vh]">
+        {/* ── Sticky 3D + scrolling text ───────────────────────────── */}
+        {/*
+          NOTE: `items-start` is critical. Without it the grid stretches both
+          columns to the same height and sticky cannot work on the right one.
+        */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
+          {/* RIGHT column first in source order so we can re-order it on
+              mobile (text first, scene below) while keeping the source
+              easy to read. On md+ we put the scene on the right with
+              `md:order-2` and the text on the left with `md:order-1`. */}
+
+          {/* Sticky 3D scene */}
+          <aside className="hidden md:block md:order-2">
+            <div
+              className="sticky top-24 h-[78vh] rounded-md overflow-hidden border hairline bg-ink-950/80 relative"
+              // `will-change: transform` keeps Safari's sticky implementation honest.
+              style={{ willChange: "transform" }}
+            >
+              <Scene3D step={active} parallax={parallax} />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink-950/80 via-transparent to-ink-950/20" />
+              <StackOverlay step={current} index={active + 1} total={STEPS.length} />
+            </div>
+          </aside>
+
+          {/* Scrolling steps */}
+          <ol className="md:order-1 space-y-0">
             {STEPS.map((s, i) => (
               <li
                 key={s.id}
                 data-idx={i}
                 ref={(el) => (stepRefs.current[i] = el)}
-                className="min-h-[40vh]"
+                className="min-h-[80vh] flex items-center"
               >
                 <motion.div
-                  initial={{ opacity: 0.25, y: 24 }}
+                  initial={{ opacity: 0.2, y: 24 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ amount: 0.5, once: false }}
+                  viewport={{ amount: 0.4, once: false }}
                   transition={{ duration: 0.6, ease: [0.2, 0.7, 0.2, 1] }}
-                  className={`max-w-xl ${active === i ? "" : "opacity-60"}`}
+                  animate={{ opacity: active === i ? 1 : 0.45 }}
+                  className="max-w-xl"
                 >
                   <div className="text-[11px] uppercase tracking-[0.25em] text-bone-400">
                     {s.kicker}
@@ -182,20 +209,13 @@ export const Storytelling: React.FC = () => {
               </li>
             ))}
           </ol>
-
-          {/* Right: sticky 3D scene */}
-          <aside className="hidden md:block">
-            <div className="sticky top-24 h-[80vh] rounded-md overflow-hidden border hairline bg-ink-950/80 relative">
-              <Scene3D step={active} parallax={parallax} />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink-950/80 via-transparent to-ink-950/20" />
-              <StackOverlay step={current} index={active + 1} total={STEPS.length} />
-            </div>
-          </aside>
         </div>
       </div>
     </section>
   );
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 const StackOverlay: React.FC<{ step: StoryStep; index: number; total: number }> = ({
   step,
