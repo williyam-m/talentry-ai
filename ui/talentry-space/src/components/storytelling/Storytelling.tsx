@@ -85,9 +85,9 @@ const STEPS: StoryStep[] = [
     body:
       "The final top-K is materialised with a per-candidate score breakdown and " +
       "a 1-2 sentence justification that cites real facts. The same payload is " +
-      "written to a validator-clean submission.csv served via " +
-      "/api/submission.csv?session=...",
-    stack: ["FastAPI", "GZip middleware", "LRU result cache", "validator-clean CSV"],
+      "written to a validator-clean Ranked_shortlist.csv served via " +
+      "/api/submission.csv?session=... (downloaded as Ranked_shortlist.csv / .xlsx).",
+    stack: ["FastAPI", "GZip middleware", "LRU result cache", "Ranked_shortlist CSV/XLSX"],
   },
 ];
 
