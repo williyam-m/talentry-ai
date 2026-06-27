@@ -59,7 +59,8 @@ from talentry.io.schema import (
     validate_batch,
     validate_candidate,
 )
-from talentry.io.submission import write_submission
+from talentry.io.submission import write_submission, write_submission_xlsx
+
 from talentry.ranker import parse_job_description, rank_candidates
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -141,7 +142,28 @@ async def _observability(request: Request, call_next):
 # ─────────────────────────────────────────────────────────────────────────────
 # Fixture + state
 
-_SAMPLE_FIXTURE = Path(__file__).resolve().parents[3] / "data" / "raw" / "sample_candidates.json"
+def _resolve_sample_fixture() -> Path | None:
+    """Find sample_candidates.json in either the source tree or the package.
+
+    In development we keep the fixture at ``data/raw/sample_candidates.json``
+    (the same path the CLI + Makefile expect). When the package is installed
+    or the HF Space image is built, ``data/raw/`` is not necessarily on disk
+    in the location Python sees, so we also ship the file inside the
+    importable ``talentry.resources`` package and prefer whichever copy
+    exists.
+    """
+    candidates = [
+        Path(__file__).resolve().parents[3] / "data" / "raw" / "sample_candidates.json",
+        Path(__file__).resolve().parents[1] / "resources" / "sample_candidates.json",
+    ]
+    for p in candidates:
+        if p.exists():
+            return p
+    return None
+
+
+_SAMPLE_FIXTURE = _resolve_sample_fixture()
+
 _SESSIONS: dict[str, Path] = {}
 _RANK_CACHE: "OrderedDict[str, bytes]" = OrderedDict()
 
@@ -188,7 +210,7 @@ def schema() -> JSONResponse:
 @app.get("/api/sample")
 def sample(limit: int = Query(10, ge=1, le=100)) -> JSONResponse:
     """Return up to `limit` candidates from the bundled fixture."""
-    if not _SAMPLE_FIXTURE.exists():
+    if _SAMPLE_FIXTURE is None:
         raise HTTPException(404, "sample fixture not bundled in this deployment")
     out: list[dict[str, Any]] = []
     try:
@@ -204,7 +226,7 @@ def sample(limit: int = Query(10, ge=1, le=100)) -> JSONResponse:
 @app.get("/api/sample/download")
 def sample_download() -> FileResponse:
     """Stream the bundled sample_candidates.json as a downloadable file."""
-    if not _SAMPLE_FIXTURE.exists():
+    if _SAMPLE_FIXTURE is None:
         raise HTTPException(404, "sample fixture not bundled")
     return FileResponse(
         _SAMPLE_FIXTURE,
@@ -271,7 +293,7 @@ async def validate(
     """
 
     if use_sample:
-        if not _SAMPLE_FIXTURE.exists():
+        if _SAMPLE_FIXTURE is None:
             raise HTTPException(404, "sample fixture not bundled")
         records = list(iter_candidate_records(_SAMPLE_FIXTURE))
     else:
@@ -378,7 +400,7 @@ async def rank(
     rid = getattr(request.state, "request_id", "-")
 
     if use_sample:
-        if not _SAMPLE_FIXTURE.exists():
+        if _SAMPLE_FIXTURE is None:
             raise HTTPException(404, "sample fixture not bundled")
         raw_records = list(iter_candidate_records(_SAMPLE_FIXTURE))
         cache_key = f"sample:{top_k}"
@@ -436,8 +458,23 @@ async def rank(
     if jd is not None:
         jd_bytes = await _read_capped(jd)
         if jd_bytes:
-            jd_text = jd_bytes.decode("utf-8", errors="replace")
+            # JD may come as a plain text file OR a .docx (Word). Both are
+            # acceptable per the hackathon spec — the official Redrob bundle
+            # ships `job_description.docx` for example.
+            jd_name = (jd.filename or "").lower()
+            try:
+                if jd_name.endswith(".docx"):
+                    from talentry.io.resume import _extract_docx  # internal helper
+                    jd_text = _extract_docx(jd_bytes)
+                elif jd_name.endswith(".pdf"):
+                    from talentry.io.resume import _extract_pdf
+                    jd_text = _extract_pdf(jd_bytes)
+                else:
+                    jd_text = jd_bytes.decode("utf-8", errors="replace")
+            except Exception as exc:
+                raise HTTPException(422, f"could not read job description: {exc}") from exc
     job = parse_job_description(jd_text)
+
 
     effective_top_k = min(top_k, _max_top_k(len(parsed)))
 
@@ -506,6 +543,45 @@ def submission_csv(session: str = Query(...)) -> FileResponse:
         media_type="text/csv",
         filename="submission.csv",
     )
+
+
+@app.get("/api/submission.xlsx")
+def submission_xlsx(session: str = Query(...)) -> FileResponse:
+    """Return the same shortlist as `submission.csv` but as a styled XLSX."""
+    csv_path = _SESSIONS.get(session)
+    if csv_path is None or not csv_path.exists():
+        raise HTTPException(404, "no submission found for that session id")
+
+    # Materialise the XLSX next to the CSV on first request, then cache.
+    xlsx_path = csv_path.with_suffix(".xlsx")
+    if not xlsx_path.exists():
+        import csv as _csv
+        from talentry.core.models import RankedCandidate, ScoreBreakdown
+
+        rows: list[RankedCandidate] = []
+        with csv_path.open("r", encoding="utf-8") as fh:
+            reader = _csv.DictReader(fh)
+            for row in reader:
+                rows.append(
+                    RankedCandidate(
+                        candidate_id=row["candidate_id"],
+                        rank=int(row["rank"]),
+                        score=float(row["score"]),
+                        reasoning=row.get("reasoning", ""),
+                        breakdown=ScoreBreakdown(),
+                    )
+                )
+        try:
+            write_submission_xlsx(rows, xlsx_path, strict=False)
+        except Exception as exc:
+            raise HTTPException(500, f"could not materialise XLSX: {exc}") from exc
+
+    return FileResponse(
+        xlsx_path,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        filename="submission.xlsx",
+    )
+
 
 
 def run() -> None:  # pragma: no cover
