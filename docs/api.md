@@ -4,7 +4,9 @@ The FastAPI server (`talentry-serve` or the bundled HuggingFace Space) exposes
 three endpoints. All payloads are JSON; the only non-JSON response is the
 CSV download.
 
-Base URL inside the Space: `https://huggingface.co/spaces/williyam/talentry-ai`
+Live URL: `https://williyam-talentry-ai.hf.space`
+Repo on HF: `https://huggingface.co/spaces/williyam/talentry-ai`
+
 (the same origin serves the React SPA).
 
 ---
@@ -91,10 +93,19 @@ returned and the CSV is persisted for download.
 
 ## `GET /api/submission.csv?session=<id>`
 
-Download the validator-clean 100-row CSV produced by a prior `/api/rank`
-call that requested `top_k=100`.
+Download the validator-clean ranked shortlist produced by a prior
+`/api/rank` call. The file is delivered as `Ranked_shortlist.csv` in
+the browser; only `top_k=100` results pass the official
+`validate_submission.py` validator.
 
 Sessions are kept in process memory and will not survive a restart.
+
+## `GET /api/submission.xlsx?session=<id>`
+
+Same shortlist as `submission.csv` but returned as a styled XLSX workbook
+(frozen header, sized columns, wrapped reasoning column). The file is
+delivered as `Ranked_shortlist.xlsx`.
+
 
 ---
 
