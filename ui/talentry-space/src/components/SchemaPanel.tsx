@@ -64,7 +64,8 @@ export const SchemaPanel: React.FC = () => {
           <p className="text-xs text-bone-400 mt-1">
             The exact shape your <code className="font-mono text-bone-200">.json</code> /{" "}
             <code className="font-mono text-bone-200">.jsonl</code> upload must satisfy.
-            We validate every record against this — green/red diff included.
+            We validate every record against this — git diff style report included.
+
           </p>
         </div>
         <span
