@@ -17,11 +17,12 @@ The system is built for the constraints that actually matter in production:
 
 | Constraint                       | Talentry AI                        |
 | -------------------------------- | ---------------------------------- |
-| Runtime (100K candidates)        | **≈ 90 seconds** on a CPU laptop   |
+| Runtime (100K candidates)        | **≈ 90 seconds** on a single CPU   |
 | Memory                           | **< 4 GB RAM**                     |
 | GPU                              | **Not required**                   |
 | Network during ranking           | **Zero** (no LLM API calls)        |
 | Reproducibility                  | One command — `make submission`    |
+
 
 ---
 
@@ -104,7 +105,8 @@ pip install -e ".[dev]"
 # 3. Place the official candidates.jsonl in data/raw/
 cp /path/to/candidates.jsonl data/raw/
 
-# 4. Produce the submission (≤ 5 min on a CPU laptop)
+# 4. Produce the submission (≤ 5 min, CPU-only)
+
 make submission
 # or, equivalently:
 python -m talentry.cli.rank \
@@ -141,8 +143,9 @@ The Space ships with several upgrades that take it from "demo" to
 
 * **Schema-first ingestion.** Every upload is validated against
   `candidate_schema.json` before a single token is scored. Mismatches
-  surface as a **GitHub-style green/red diff** so you can see exactly which
+  surface as a **git diff style report** so you can see exactly which
   required field is missing or which enum value is wrong.
+
 * **Drag-and-drop résumé parsing.** Upload one or many résumés
   (PDF / DOCX / TXT / MD) and the backend produces schema-conformant
   candidate records using deterministic rule-based parsers — zero LLM
