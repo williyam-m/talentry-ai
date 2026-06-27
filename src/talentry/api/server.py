@@ -399,11 +399,25 @@ async def rank(
     """
     rid = getattr(request.state, "request_id", "-")
 
+    # ── Pre-read JD so its digest can participate in the cache key ──────
+    # Otherwise re-running with the same candidates but a different JD
+    # would return the cached result for the previous JD.
+    jd_bytes: bytes | None = None
+    jd_filename = ""
+    if jd is not None:
+        jd_bytes = await _read_capped(jd)
+        jd_filename = (jd.filename or "").lower()
+    jd_digest = (
+        hashlib.sha1(jd_bytes or b"", usedforsecurity=False).hexdigest()[:12]
+        if jd_bytes
+        else "default"
+    )
+
     if use_sample:
         if _SAMPLE_FIXTURE is None:
             raise HTTPException(404, "sample fixture not bundled")
         raw_records = list(iter_candidate_records(_SAMPLE_FIXTURE))
-        cache_key = f"sample:{top_k}"
+        cache_key = f"sample:{top_k}:jd={jd_digest}"
     else:
         if candidates is None:
             raise HTTPException(400, "supply a `candidates` upload or set use_sample=true")
@@ -412,10 +426,11 @@ async def rank(
             raise HTTPException(400, "candidates upload was empty")
         raw_records = _load_records_from_bytes(payload, candidates.filename or "")
         digest = hashlib.sha1(payload, usedforsecurity=False).hexdigest()[:16]
-        cache_key = f"u:{digest}:{top_k}"
+        cache_key = f"u:{digest}:{top_k}:jd={jd_digest}"
 
     if not raw_records:
         raise HTTPException(422, "no candidate records found in upload")
+
 
     # ── Schema gate ──────────────────────────────────────────────────────
     if not skip_validation:
@@ -454,26 +469,34 @@ async def rank(
 
     parsed = [to_candidate(r) for r in raw_records]
 
+    # JD bytes were already read above (so they could participate in the
+    # cache key). Decode them into text here using the right extractor for
+    # the file format.
     jd_text: str | None = None
-    if jd is not None:
-        jd_bytes = await _read_capped(jd)
-        if jd_bytes:
-            # JD may come as a plain text file OR a .docx (Word). Both are
-            # acceptable per the hackathon spec — the official Redrob bundle
-            # ships `job_description.docx` for example.
-            jd_name = (jd.filename or "").lower()
-            try:
-                if jd_name.endswith(".docx"):
-                    from talentry.io.resume import _extract_docx  # internal helper
-                    jd_text = _extract_docx(jd_bytes)
-                elif jd_name.endswith(".pdf"):
-                    from talentry.io.resume import _extract_pdf
-                    jd_text = _extract_pdf(jd_bytes)
-                else:
-                    jd_text = jd_bytes.decode("utf-8", errors="replace")
-            except Exception as exc:
-                raise HTTPException(422, f"could not read job description: {exc}") from exc
+    if jd_bytes:
+        try:
+            if jd_filename.endswith(".docx"):
+                from talentry.io.resume import _extract_docx
+                jd_text = _extract_docx(jd_bytes)
+            elif jd_filename.endswith(".pdf"):
+                from talentry.io.resume import _extract_pdf
+                jd_text = _extract_pdf(jd_bytes)
+            else:
+                jd_text = jd_bytes.decode("utf-8", errors="replace")
+        except Exception as exc:
+            raise HTTPException(422, f"could not read job description: {exc}") from exc
     job = parse_job_description(jd_text)
+    if jd_text:
+        _LOG.info(
+            "rank: using uploaded JD (%s, %d bytes, %d chars)",
+            jd_filename or "?",
+            len(jd_bytes or b""),
+            len(jd_text),
+            extra={"request_id": rid},
+        )
+    else:
+        _LOG.info("rank: no JD uploaded — using bundled default", extra={"request_id": rid})
+
 
 
     effective_top_k = min(top_k, _max_top_k(len(parsed)))
@@ -535,19 +558,25 @@ async def rank(
 
 @app.get("/api/submission.csv")
 def submission_csv(session: str = Query(...)) -> FileResponse:
+    """Return the ranked shortlist as a validator-clean CSV.
+
+    The on-disk filename users see is `Ranked_shortlist.csv` (per UX brief);
+    the route name stays `submission.csv` for hackathon-validator parity.
+    """
     path = _SESSIONS.get(session)
     if path is None or not path.exists():
         raise HTTPException(404, "no submission found for that session id")
     return FileResponse(
         path,
         media_type="text/csv",
-        filename="submission.csv",
+        filename="Ranked_shortlist.csv",
     )
 
 
 @app.get("/api/submission.xlsx")
 def submission_xlsx(session: str = Query(...)) -> FileResponse:
-    """Return the same shortlist as `submission.csv` but as a styled XLSX."""
+    """Return the same ranked shortlist as `submission.csv` but as a styled XLSX."""
+
     csv_path = _SESSIONS.get(session)
     if csv_path is None or not csv_path.exists():
         raise HTTPException(404, "no submission found for that session id")
