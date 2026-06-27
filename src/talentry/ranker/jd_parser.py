@@ -76,11 +76,27 @@ _DISQUALIFIER_SEED: list[str] = [
 
 
 def _read(jd: str | Path | None) -> str:
+    """Read JD source. Accepts a Path / path-like / raw string.
+
+    File formats supported: .txt, .md, .docx, .pdf. Anything else is read
+    as UTF-8 text. A raw string is returned as-is.
+    """
     if jd is None:
         return _DEFAULT_JD_TEXT
     if isinstance(jd, Path) or (isinstance(jd, str) and Path(jd).exists()):
-        return Path(jd).read_text(encoding="utf-8")
+        path = Path(jd)
+        suffix = path.suffix.lower()
+        if suffix == ".docx":
+            from talentry.io.resume import _extract_docx
+            return _extract_docx(path.read_bytes())
+        if suffix == ".pdf":
+            from talentry.io.resume import _extract_pdf
+            return _extract_pdf(path.read_bytes())
+        # Plain text — be permissive about encoding (the bundled JD ships
+        # as UTF-8 but uploads may be cp1252 / latin-1).
+        return path.read_text(encoding="utf-8", errors="replace")
     return str(jd)
+
 
 
 def parse_job_description(jd: str | Path | None = None) -> JobRequirements:
