@@ -133,12 +133,18 @@ export const RunPanel: React.FC<Props> = ({
           accent="bone"
         />
         <DropField
-          label="Job description (.txt, optional)"
+          label="Job description (.txt / .md / .docx / .pdf) - optional"
           dropzone={jdDrop}
           file={jd}
           onClear={() => setJd(null)}
           accent="bone"
+          hint={
+            jd
+              ? `Will rank against your uploaded JD`
+              : `If empty, the bundled Senior-AI-Engineer JD is used`
+          }
         />
+
       </div>
 
       <div className="flex flex-wrap items-center gap-4 mb-6">
@@ -226,13 +232,15 @@ interface DropFieldProps {
   onClear: () => void;
   dropzone: ReturnType<typeof useDropzone>;
   accent: "bone" | "red";
+  hint?: string;
 }
 
-const DropField: React.FC<DropFieldProps> = ({ label, file, onClear, dropzone }) => {
+const DropField: React.FC<DropFieldProps> = ({ label, file, onClear, dropzone, hint }) => {
   const { getRootProps, getInputProps, isDragActive, isDragReject } = dropzone;
   return (
     <div>
       <div className="text-[11px] uppercase tracking-widest text-bone-400 mb-2">{label}</div>
+
       <div
         {...getRootProps()}
         className={`relative card flex items-center justify-between px-4 py-3 cursor-pointer transition-all ${
@@ -262,8 +270,14 @@ const DropField: React.FC<DropFieldProps> = ({ label, file, onClear, dropzone })
           <span className="btn-ghost pointer-events-none">Browse</span>
         )}
       </div>
+      {hint && (
+        <div className="text-[10px] text-bone-400 mt-1.5 italic font-mono">
+          {hint}
+        </div>
+      )}
     </div>
   );
 };
+
 
 export default RunPanel;
