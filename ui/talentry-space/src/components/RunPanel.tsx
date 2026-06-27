@@ -99,10 +99,11 @@ export const RunPanel: React.FC<Props> = ({
         </h2>
         <p className="text-xs text-bone-400 mt-2 max-w-2xl">
           Drop your candidates file, or click <em>"Feed sample candidates"</em> to
-          explore with the bundled 50-row fixture. We always validate against the
-          official Redrob schema first — bad data produces a green/red diff, not
-          a stack trace.
+          explore with the bundled 50-row fixture. Every upload is validated
+          against the official Redrob schema first — mismatches surface as a
+          git diff style report, not a stack trace.
         </p>
+
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
