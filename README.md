@@ -2,10 +2,16 @@
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-black.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
-[![HF Space](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Space-black)](https://huggingface.co/spaces/williyam/talentry-ai)
+[![HF Space](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Space-black)](https://williyam-talentry-ai.hf.space)
+
+> ### 🚀 Live demo: **https://williyam-talentry-ai.hf.space**
+> Drag-and-drop a `candidates.jsonl` + a JD (`.docx` / `.pdf` / `.txt` / `.md`)
+> and get a ranked, explainable shortlist plus a downloadable `Ranked_shortlist.csv`
+> / `.xlsx` in seconds.
 
 > Submission to the **Redrob x Hack2Skill - India Runs** Intelligent Candidate
 > Discovery & Ranking Challenge.
+
 
 Talentry AI is a production-grade ranking engine that turns a 100K candidate
 pool into a precise, defensible top-100 shortlist for a single job description.
@@ -114,11 +120,14 @@ python validate_submission.py data/output/submission.csv
 
 React (Vite + TypeScript + Tailwind) frontend backed by FastAPI:
 
-**https://huggingface.co/spaces/williyam/talentry-ai**
+* **App URL:** https://williyam-talentry-ai.hf.space
+* **Repo on HF:** https://huggingface.co/spaces/williyam/talentry-ai
 
 It accepts a candidate sample (<= 100 candidates) via upload or a one-click
-preloaded fixture and produces a ranked CSV plus a live, drill-down dashboard
-that shows **why** each candidate landed at their rank.
+preloaded fixture and produces a `Ranked_shortlist.{csv,xlsx}` download plus
+a live, drill-down dashboard that shows **why** each candidate landed at
+their rank.
+
 
 ### v1.1 - Production hardening
 
