@@ -71,16 +71,28 @@ const App: React.FC = () => {
   }, []);
 
   // ─── Lenis smooth scrolling ───────────────────────────────────────────
+  // Lenis is intentionally tame: low duration, native wheel multiplier of 1.
+  // We also dispatch a native `scroll` event on each Lenis frame so any
+  // library that reads from `window.scrollY` (framer-motion's `useScroll`
+  // most importantly) stays in sync with the visually-rendered scroll
+  // position. Without this the scroll-pinned storytelling section appears
+  // to "freeze" because useScroll sees the untouched native scroll position.
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
     if (prefersReducedMotion) return;
     const lenis = new Lenis({
-      duration: 1.1,
+      duration: 0.9,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
+      // Any scrollable element marked `data-lenis-prevent` (the ranked-
+      // shortlist scroll box, the schema-diff panels, etc.) keeps its
+      // native scroll behaviour instead of having Lenis hijack the wheel.
+      prevent: (node) =>
+        node instanceof HTMLElement && !!node.closest("[data-lenis-prevent]"),
     });
+
     let raf = 0;
     const tick = (time: number) => {
       lenis.raf(time);
@@ -92,6 +104,7 @@ const App: React.FC = () => {
       lenis.destroy();
     };
   }, []);
+
 
   // ─── Reveal-on-scroll for `.reveal` elements ─────────────────────────
   useEffect(() => {
@@ -125,7 +138,8 @@ const App: React.FC = () => {
   }
 
   return (
-    <div id="top" className="relative min-h-screen flex flex-col overflow-x-hidden">
+    <div id="top" className="relative min-h-screen flex flex-col">
+
       {/* Animated background */}
       <div className="bg-aurora" aria-hidden />
       <div className="bg-grid" aria-hidden />
