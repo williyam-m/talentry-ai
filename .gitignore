@@ -16,6 +16,7 @@ data/output/
 # Node / Vite
 ui/talentry-space/node_modules/
 ui/talentry-space/dist/
+ui/talentry-space/tsconfig.tsbuildinfo
 
 # Editor
 .DS_Store
