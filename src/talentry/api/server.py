@@ -21,8 +21,9 @@ Production-grade hardening applied here:
   be hundreds of KB of breakdowns) ships ~5× smaller over the wire.
 * **Hardened upload limits** (10 MB body cap for résumés/JSON uploads) to
   protect the Space from accidental OOM on free-tier 2 GB containers.
-* **Schema-aware error responses** so the UI can render a GitHub-style
-  green/red diff when an upload doesn't match the official Redrob schema.
+* **Schema-aware error responses** so the UI can render a git-diff-style
+  inline report when an upload doesn't match the official Redrob schema.
+
 * **Structured logging** + request-id propagation for observability.
 * **In-memory LRU result cache** keyed by upload hash so re-clicking
   "Rank" on the same dataset returns in <10 ms.
@@ -38,8 +39,10 @@ import tempfile
 import time
 import uuid
 from collections import OrderedDict
+from functools import partial
 from pathlib import Path
 from typing import Any
+
 
 import orjson
 from fastapi import FastAPI, File, HTTPException, Query, Request, UploadFile
@@ -260,10 +263,11 @@ async def validate(
 ) -> JSONResponse:
     """Validate an uploaded candidates file against the official schema.
 
-    Returns a structured report — including a GitHub-style diff for the
-    first invalid record — so the UI can highlight exactly which fields
-    are missing, wrong-typed, or violate enums/ranges.
+    Returns a structured report — including a git-diff-style payload for
+    the first invalid record — so the UI can highlight exactly which
+    fields are missing, wrong-typed, or violate enums/ranges.
     """
+
     if use_sample:
         if not _SAMPLE_FIXTURE.exists():
             raise HTTPException(404, "sample fixture not bundled")
@@ -437,7 +441,12 @@ async def rank(
 
     # Ranking is CPU-bound — offload to a worker thread so the FastAPI
     # event loop continues serving other clients (health checks, etc.).
-    ranked = await asyncio.to_thread(rank_candidates, parsed, job, effective_top_k)
+    # NOTE: rank_candidates declares top_k as kw-only, hence functools.partial.
+    ranked = await asyncio.to_thread(
+        partial(rank_candidates, parsed, job, top_k=effective_top_k)
+    )
+
+
 
     # Materialise CSV for the session (UI can offer a "download CSV" button
     # using GET /api/submission.csv) regardless of top_k size.
