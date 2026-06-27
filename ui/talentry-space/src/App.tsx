@@ -1,5 +1,5 @@
 /**
- * Talentry AI — application shell.
+ * Talentry AI - application shell.
  *
  * Composition (top → bottom):
  *   <Header/>            sticky logo + nav
@@ -10,7 +10,7 @@
  *   <JdSummary/>         backend's interpretation of the JD
  *   <ResultsTable + Breakdown/>   ranked top-K with explainability
  *   <Storytelling/>      sticky 3D scene + scroll-triggered guide
- *   <ResumeUpload/>      multi-résumé → schema-clean records (last section)
+ *   <ResumeUpload/>      multi-resume → schema-clean records (last section)
  *   <Footer/>
  *
  * Smooth scrolling is provided by Lenis (Stripe-like inertia), and the
@@ -18,7 +18,7 @@
  * through the pipeline steps.
  *
  * IMPORTANT: the Storytelling section is intentionally NOT wrapped in a
- * `.reveal` div with `overflow-hidden` semantics — that would clip the
+ * `.reveal` div with `overflow-hidden` semantics - that would clip the
  * sticky 3D scene as soon as the section came into view.
  */
 
@@ -158,8 +158,9 @@ const App: React.FC = () => {
           <p className="mt-5 text-base sm:text-lg text-bone-300 max-w-2xl">
             BM25 + TF-IDF hybrid ranking with schema-first ingestion, behavioural
             signals, honeypot detection and a fully explainable score
-            breakdown — 100,000 candidates in under 90 seconds, no GPU, no LLM API calls.
+            breakdown. 100K candidates in <span className="font-mono">&lt; 90 sec.</span>, 1 CPU, 0 LLM calls.
           </p>
+
         </section>
 
         {/* ─── Run controls ──────────────────────────────────────────── */}
@@ -229,13 +230,13 @@ const App: React.FC = () => {
 
         {/*
           ─── Immersive storytelling guide ────────────────────────────
-          NOTE: deliberately NOT wrapped in `.reveal` — that wrapper applies a
+          NOTE: deliberately NOT wrapped in `.reveal` - that wrapper applies a
           CSS transform which establishes a containing block for `position:
           sticky` descendants and would prevent the 3D scene from pinning.
         */}
         <Storytelling />
 
-        {/* ─── Résumé uploader (last) ────────────────────────────────── */}
+        {/* ─── Resume uploader (last) ────────────────────────────────── */}
         <div className="reveal">
           <ResumeUpload onParsed={(file) => setPrefilledCandidates(file)} />
         </div>
