@@ -1,4 +1,4 @@
-"""Tests for the rule-based résumé parser."""
+"""Tests for the rule-based resume parser."""
 
 from __future__ import annotations
 
