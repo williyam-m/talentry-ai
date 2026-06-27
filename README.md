@@ -134,6 +134,46 @@ It accepts a small candidate sample (≤ 100 candidates) via upload or a one-cli
 preloaded fixture and produces a ranked CSV plus a live, drill-down dashboard
 that shows **why** each candidate landed at their rank.
 
+### v1.1 — Production hardening & richer UX
+
+The Space ships with several upgrades that take it from "demo" to
+"world-class production":
+
+* **Schema-first ingestion.** Every upload is validated against
+  `candidate_schema.json` before a single token is scored. Mismatches
+  surface as a **GitHub-style green/red diff** so you can see exactly which
+  required field is missing or which enum value is wrong.
+* **Drag-and-drop résumé parsing.** Upload one or many résumés
+  (PDF / DOCX / TXT / MD) and the backend produces schema-conformant
+  candidate records using deterministic rule-based parsers — zero LLM
+  hallucinations. Each record is re-validated against the schema before
+  being handed to the ranker.
+* **"Feed sample candidates"** — a one-click button to explore the UI
+  using the bundled 50-row fixture.
+* **Immersive 3D scroll-storytelling guide** powered by React Three
+  Fiber + Lenis smooth scrolling. As you scroll the geometry morphs to
+  illustrate the five pipeline stages (ingest → validate → understand →
+  signals → ship) with the tech used at each step labelled inline.
+* **Production hardening.** GZip middleware (5× smaller breakdown JSON),
+  10 MB upload caps, structured 413/415/422 error responses, LRU result
+  cache keyed by upload SHA-1 (~10 ms cache hits), request-id propagation,
+  `x-elapsed-ms` headers, and `asyncio.to_thread` offload for the
+  CPU-bound ranking + résumé parsing work so the event loop never blocks.
+* **Code-split bundle.** Three.js / R3F / framer-motion ship as separate
+  chunks so the above-the-fold first paint stays small (~35 KB gz app code).
+
+#### New endpoints
+
+| Verb | Path                         | Purpose                                              |
+| ---- | ---------------------------- | ---------------------------------------------------- |
+| GET  | `/api/schema`                | Returns the bundled `candidate_schema.json`.         |
+| GET  | `/api/sample`                | Returns up to 100 candidates from the fixture.       |
+| GET  | `/api/sample/download`       | Streams the full fixture as a download.              |
+| POST | `/api/validate`              | Validates an upload, returns report + diff.          |
+| POST | `/api/parse-resumes`         | Multi-file résumé → schema-conformant candidates.    |
+| POST | `/api/rank`                  | Schema-gated by default; pass `skip_validation=true` to bypass. |
+
+
 ---
 
 ## 🧪 Testing
