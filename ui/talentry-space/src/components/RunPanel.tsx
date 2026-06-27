@@ -4,9 +4,9 @@
  * Three orthogonal ways to feed candidates to the API:
  *   1. Upload your own `.json/.jsonl/.jsonl.gz` (drag-and-drop).
  *   2. Click "Feed sample candidates" → uses the bundled fixture.
- *   3. Use the `prefilled` prop from the parent (e.g. résumé parser).
+ *   3. Use the `prefilled` prop from the parent (e.g. resume parser).
  *
- * Schema-validation errors are NOT caught here — they bubble up to
+ * Schema-validation errors are NOT caught here - they bubble up to
  * App.tsx so it can render the dedicated <SchemaDiff/> panel.
  */
 
@@ -73,15 +73,24 @@ export const RunPanel: React.FC<Props> = ({
     }
   }
 
+  // NOTE: many browsers report `.jsonl` as `application/octet-stream` and
+  // some report `.gz` as `application/x-gzip`. Listing the extensions under
+  // a wildcard MIME key tells react-dropzone to match by extension first,
+  // which is what we want.
   const candidateDrop = useDropzone({
     onDrop: (files) => files[0] && setCandidates(files[0]),
     multiple: false,
     accept: {
-      "application/json": [".json", ".jsonl"],
+      "application/json": [".json"],
+      "application/x-ndjson": [".jsonl"],
+      "application/octet-stream": [".jsonl", ".gz"],
       "application/gzip": [".gz"],
+      "application/x-gzip": [".gz"],
     },
-    maxSize: 10 * 1024 * 1024,
+    // 600 MB - the official candidates.jsonl is ~480 MB.
+    maxSize: 600 * 1024 * 1024,
   });
+
 
   const jdDrop = useDropzone({
     onDrop: (files) => files[0] && setJd(files[0]),
@@ -100,7 +109,7 @@ export const RunPanel: React.FC<Props> = ({
         <p className="text-xs text-bone-400 mt-2 max-w-2xl">
           Drop your candidates file, or click <em>"Feed sample candidates"</em> to
           explore with the bundled 50-row fixture. Every upload is validated
-          against the official Redrob schema first — mismatches surface as a
+          against the official Redrob schema first - mismatches surface as a
           git diff style report, not a stack trace.
         </p>
 
