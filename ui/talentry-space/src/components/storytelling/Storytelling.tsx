@@ -18,14 +18,11 @@
  * the "scene goes away after step 1" bug we were seeing.
  */
 
-import React, { useMemo, useRef } from "react";
-import {
-  motion,
-  useMotionValueEvent,
-  useScroll,
-  useTransform,
-} from "framer-motion";
+import React, { useEffect, useMemo, useRef } from "react";
+import { motion } from "framer-motion";
 import { Scene3D } from "./Scene3D";
+
+
 
 interface StoryStep {
   id: string;
@@ -96,31 +93,47 @@ const STEPS: StoryStep[] = [
 
 export const Storytelling: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const stickyRef = useRef<HTMLDivElement>(null);
 
   // Each step occupies one viewport-height of scroll.
   const N = STEPS.length;
   const heightVh = N * 100;
 
-  // Progress is 0 at the top of the section (sticky just attached) and 1
-  // when the last viewport has scrolled past the bottom of the sticky.
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    // start when the section's top reaches the viewport top,
-    // end when the bottom reaches the viewport bottom.
-    offset: ["start start", "end end"],
-  });
-
-  // Derive a discrete active index (0..N-1) from the continuous progress.
-  const activeMV = useTransform(scrollYProgress, (p) =>
-    Math.min(N - 1, Math.max(0, Math.floor(p * N)))
-  );
-
+  // We compute `active` from the section's bounding rect on every scroll
+  // tick. This is more robust than framer-motion's `useScroll` here because:
+  //   1. Lenis hijacks the native scroll position via `transform: translateY`
+  //      on the body, so `window.scrollY` lags behind the actual rendered
+  //      position, which would freeze framer-motion's hook.
+  //   2. `getBoundingClientRect` always reflects the *rendered* layout,
+  //      which is exactly the "visible scroll progress" we want here.
   const [active, setActive] = React.useState(0);
-  useMotionValueEvent(activeMV, "change", (v) => {
-    const i = Math.round(v as number);
-    setActive((cur) => (cur === i ? cur : i));
-  });
+  useEffect(() => {
+    let frame = 0;
+    function update() {
+      frame = 0;
+      const el = sectionRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      // 0 when the section's top has just reached y=0,
+      // 1 when the section's bottom has reached the viewport bottom.
+      const total = rect.height - window.innerHeight;
+      const p = total > 0 ? Math.min(1, Math.max(0, -rect.top / total)) : 0;
+      const i = Math.min(N - 1, Math.max(0, Math.floor(p * N)));
+      setActive((cur) => (cur === i ? cur : i));
+    }
+    function onScroll() {
+      if (frame) return;
+      frame = requestAnimationFrame(update);
+    }
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [N]);
+
 
   // Mouse parallax for the 3D scene.
   const [parallax, setParallax] = React.useState({ x: 0, y: 0 });
@@ -160,10 +173,8 @@ export const Storytelling: React.FC = () => {
         className="relative"
         style={{ height: `${heightVh}vh` }}
       >
-        <div
-          ref={stickyRef}
-          className="sticky top-0 h-screen flex items-center"
-        >
+        <div className="sticky top-0 h-screen flex items-center">
+
           <div className="mx-auto max-w-7xl w-full px-4 sm:px-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
               {/* ── Left: crossfaded text ─────────────────────────── */}
