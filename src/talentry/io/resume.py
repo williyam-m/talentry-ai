@@ -1,6 +1,6 @@
 """Resume → candidate-schema parser.
 
-Accepts free-form résumé files (PDF, DOCX, TXT, MD) and produces a
+Accepts free-form resume files (PDF, DOCX, TXT, MD) and produces a
 best-effort record that matches the official ``candidate_schema.json``.
 
 Design notes
@@ -8,12 +8,12 @@ Design notes
 
 * **Zero new heavy dependencies.** We use ``pypdf`` for PDFs and a tiny
   inline DOCX text-extractor (DOCX is just a zip of XML), so the runtime
-  image only grows by ~600 KB. Both are *optional* — if pypdf isn't
+  image only grows by ~600 KB. Both are *optional* - if pypdf isn't
   installed we still accept .txt / .md uploads.
 * **Deterministic, rule-based extraction.** This is NOT an LLM resume
-  parser — those hallucinate fields and break the downstream schema
+  parser - those hallucinate fields and break the downstream schema
   validator. Instead we use a small ensemble of regex + heuristic
-  passes that exploit common résumé conventions (Summary / Experience
+  passes that exploit common resume conventions (Summary / Experience
   / Education / Skills section headers, "YYYY – YYYY" date ranges, the
   domain lexicon used elsewhere in Talentry).
 * **Schema-aligned.** Every record we emit will pass our own
@@ -52,7 +52,7 @@ def _skill_vocab() -> list[str]:
 
 
 class ResumeParseError(Exception):
-    """Raised when a résumé cannot be decoded into plain text."""
+    """Raised when a resume cannot be decoded into plain text."""
 
 
 def _extract_pdf(payload: bytes) -> str:
@@ -116,7 +116,7 @@ def extract_text(filename: str, payload: bytes) -> str:
         except Exception as exc:
             raise ResumeParseError(f"could not decode text file: {exc}") from exc
     raise ResumeParseError(
-        f"unsupported résumé format {suffix!r}. Accepted: .pdf, .docx, .txt, .md"
+        f"unsupported resume format {suffix!r}. Accepted: .pdf, .docx, .txt, .md"
     )
 
 
@@ -138,16 +138,17 @@ _SECTION_HEADERS = {
 _EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+")
 _PHONE_RE = re.compile(r"(?:\+?\d{1,3}[\s-])?\(?\d{3,4}\)?[\s.-]?\d{3}[\s.-]?\d{3,4}")
 _YEAR_RANGE_RE = re.compile(
-    r"(\d{4})\s*[-–—to]+\s*(\d{4}|present|current)",
+    r"(\d{4})\s*(?:-|to)\s*(\d{4}|present|current)",
     re.I,
 )
+
 _MONTH_YEAR = re.compile(
     r"(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+(\d{4})", re.I
 )
 
 
 def _split_sections(text: str) -> dict[str, str]:
-    """Split résumé into named sections using header heuristics."""
+    """Split resume into named sections using header heuristics."""
     sections: dict[str, list[str]] = {"header": []}
     current = "header"
     for line in text.splitlines():
@@ -171,7 +172,7 @@ def _extract_name(header: str) -> str:
         line = raw.strip()
         if not line or _EMAIL_RE.search(line) or _PHONE_RE.search(line):
             continue
-        # Heuristic: looks like a person name — 2–5 words, mostly capitalised,
+        # Heuristic: looks like a person name - 2–5 words, mostly capitalised,
         # no digits, not all-caps section header.
         words = line.split()
         if not (2 <= len(words) <= 5):
@@ -285,7 +286,7 @@ def _extract_career(exp_text: str) -> list[dict[str, Any]]:
         except ValueError:
             continue
         # Try to pull "Title at Company" or "Title, Company" from the line.
-        pre = _YEAR_RANGE_RE.sub("", header_line).strip(" -–—|,")
+        pre = _YEAR_RANGE_RE.sub("", header_line).strip(" -–-|,")
         title, company = pre, ""
         for sep in [" at ", " @ ", ", ", " | ", " - ", " – "]:
             if sep in pre:
@@ -336,7 +337,7 @@ def _extract_education(edu_text: str) -> list[dict[str, Any]]:
             end = int(single.group(0))
             start = max(1970, end - 4)
         # Title-cased word seq = institution; rest = degree/field.
-        without_years = _YEAR_RANGE_RE.sub("", line).strip(" -–—|,")
+        without_years = _YEAR_RANGE_RE.sub("", line).strip(" -–-|,")
         parts = [p.strip() for p in re.split(r"[,|\u2022•]", without_years) if p.strip()]
         institution = parts[0] if parts else "Unknown"
         degree = parts[1] if len(parts) > 1 else "Degree"
@@ -376,7 +377,7 @@ def _guess_role_family(text: str) -> str:
     for key, value in ROLE_KEYWORD_INDEX.items():
         if key in text_l:
             # ROLE_KEYWORD_INDEX values can be either a string family or a
-            # (family, weight) tuple — be permissive.
+            # (family, weight) tuple - be permissive.
             if isinstance(value, tuple):
                 family, weight = value[0], float(value[1])
             else:
@@ -402,7 +403,7 @@ def _months_ago_iso(months: int) -> str:
 
 
 def parse_resume(filename: str, payload: bytes, *, candidate_id: str | None = None) -> dict[str, Any]:
-    """Parse one résumé into a schema-conformant candidate record."""
+    """Parse one resume into a schema-conformant candidate record."""
     text = extract_text(filename, payload)
     sections = _split_sections(text)
 
@@ -454,7 +455,7 @@ def parse_resume(filename: str, payload: bytes, *, candidate_id: str | None = No
 
 
 def parse_many(files: Iterable[tuple[str, bytes]]) -> list[dict[str, Any]]:
-    """Parse multiple résumés. Failures are recorded inline, not raised."""
+    """Parse multiple resumes. Failures are recorded inline, not raised."""
     out: list[dict[str, Any]] = []
     for i, (name, payload) in enumerate(files):
         try:
