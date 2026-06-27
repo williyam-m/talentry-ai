@@ -47,7 +47,7 @@ export const Header: React.FC<{ version?: string }> = ({ version }) => {
           </a>
           <a
             className="relative hover:text-bone-50 transition-colors after:absolute after:left-0 after:-bottom-1 after:h-px after:w-0 after:bg-bone-50 after:transition-all hover:after:w-full"
-            href="https://huggingface.co/spaces/williyam/talentry-ai"
+            href="https://williyam-talentry-ai.hf.space"
             target="_blank"
             rel="noreferrer"
           >
