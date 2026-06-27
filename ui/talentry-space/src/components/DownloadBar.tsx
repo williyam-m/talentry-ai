@@ -1,6 +1,10 @@
 /**
- * Submission download bar - both CSV (validator-friendly) and XLSX
+ * Ranked-shortlist download bar - both CSV (validator-friendly) and XLSX
  * (reviewer-friendly) are exposed because the hackathon spec accepts either.
+ *
+ * Backend routes stay `/api/submission.{csv,xlsx}` for hackathon-validator
+ * parity, but the UX surface and the on-disk filename users see is
+ * `Ranked_shortlist.{csv,xlsx}`.
  */
 
 import React from "react";
@@ -10,23 +14,31 @@ export const DownloadBar: React.FC<{ session: string | null }> = ({ session }) =
   if (!session) {
     return (
       <span className="text-[11px] text-bone-400 italic">
-        Run the ranker to enable submission download.
+        Run the ranker to enable Ranked_shortlist download.
       </span>
     );
   }
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <a className="btn-primary group relative overflow-hidden" href={csvDownloadUrl(session)} download>
+      <a
+        className="btn-primary group relative overflow-hidden"
+        href={csvDownloadUrl(session)}
+        download="Ranked_shortlist.csv"
+      >
         <span className="relative z-10 flex items-center gap-2">
           <DownloadIcon />
-          submission.csv
+          Ranked_shortlist.csv
         </span>
         <span className="absolute inset-0 bg-bone-200 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
       </a>
-      <a className="btn-ghost group relative overflow-hidden" href={xlsxDownloadUrl(session)} download>
+      <a
+        className="btn-ghost group relative overflow-hidden"
+        href={xlsxDownloadUrl(session)}
+        download="Ranked_shortlist.xlsx"
+      >
         <span className="relative z-10 flex items-center gap-2">
           <DownloadIcon />
-          submission.xlsx
+          Ranked_shortlist.xlsx
         </span>
       </a>
     </div>
