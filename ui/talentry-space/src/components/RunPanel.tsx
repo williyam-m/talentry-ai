@@ -92,12 +92,21 @@ export const RunPanel: React.FC<Props> = ({
   });
 
 
+  // JD upload — accept text, markdown, .docx and .pdf. The official Redrob
+  // bundle ships `job_description.docx`, so this must Just Work.
   const jdDrop = useDropzone({
     onDrop: (files) => files[0] && setJd(files[0]),
     multiple: false,
-    accept: { "text/plain": [".txt", ".md"] },
-    maxSize: 1 * 1024 * 1024,
+    accept: {
+      "text/plain": [".txt", ".md"],
+      "text/markdown": [".md"],
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
+      "application/pdf": [".pdf"],
+      "application/octet-stream": [".docx", ".pdf", ".txt", ".md"],
+    },
+    maxSize: 10 * 1024 * 1024,
   });
+
 
   return (
     <section className="card-glow p-6 sm:p-8 transition-transform duration-500 hover:-translate-y-1">
