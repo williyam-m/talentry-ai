@@ -1,4 +1,4 @@
-"""FastAPI server — powers the HuggingFace Space sandbox + general HTTP demo.
+"""FastAPI server - powers the HuggingFace Space sandbox + general HTTP demo.
 
 The server is deliberately stateless. Each ``POST /api/rank`` invocation:
 
@@ -11,7 +11,7 @@ The server is deliberately stateless. Each ``POST /api/rank`` invocation:
 
 Why JSON-in / JSON-out? Because the HuggingFace Space sandbox spec requires
 the system to "accept a small candidate sample (≤100 candidates) as input
-… and produce a ranked CSV" — which we satisfy with the additional
+… and produce a ranked CSV" - which we satisfy with the additional
 ``GET /api/submission.csv?session=<id>`` endpoint that serves a freshly
 written, validator-clean CSV.
 
@@ -19,7 +19,7 @@ Production-grade hardening applied here:
 
 * **Compression** via :class:`GZipMiddleware` so the ranker JSON (which can
   be hundreds of KB of breakdowns) ships ~5× smaller over the wire.
-* **Hardened upload limits** (10 MB body cap for résumés/JSON uploads) to
+* **Hardened upload limits** (10 MB body cap for resumes/JSON uploads) to
   protect the Space from accidental OOM on free-tier 2 GB containers.
 * **Schema-aware error responses** so the UI can render a git-diff-style
   inline report when an upload doesn't match the official Redrob schema.
@@ -65,9 +65,11 @@ from talentry.ranker import parse_job_description, rank_candidates
 # ─────────────────────────────────────────────────────────────────────────────
 # Configuration
 
-# Maximum upload size (10 MB). The sample fixture is ~250 KB, real shards are
-# JSONL-gz so they stay small; we don't expect legitimate uploads above this.
-_MAX_UPLOAD_BYTES = int(os.getenv("TALENTRY_MAX_UPLOAD_MB", "10")) * 1024 * 1024
+# Maximum upload size. Default 600 MB so the official 480 MB candidates.jsonl
+# fits. The sample fixture is ~250 KB; HF Space deployments override this with
+# TALENTRY_MAX_UPLOAD_MB to keep free-tier 2 GB containers safe.
+_MAX_UPLOAD_BYTES = int(os.getenv("TALENTRY_MAX_UPLOAD_MB", "600")) * 1024 * 1024
+
 _RANK_CACHE_SIZE = 16  # tiny LRU; rank payloads are big
 
 _LOG = logging.getLogger("talentry.api")
@@ -93,7 +95,7 @@ app = FastAPI(
 # ─────────────────────────────────────────────────────────────────────────────
 # Middleware
 
-# gzip ≥ 500 B payloads — JSON breakdowns compress ~5×.
+# gzip ≥ 500 B payloads - JSON breakdowns compress ~5×.
 app.add_middleware(GZipMiddleware, minimum_size=500)
 
 app.add_middleware(
@@ -263,8 +265,8 @@ async def validate(
 ) -> JSONResponse:
     """Validate an uploaded candidates file against the official schema.
 
-    Returns a structured report — including a git-diff-style payload for
-    the first invalid record — so the UI can highlight exactly which
+    Returns a structured report - including a git-diff-style payload for
+    the first invalid record - so the UI can highlight exactly which
     fields are missing, wrong-typed, or violate enums/ranges.
     """
 
@@ -298,7 +300,7 @@ async def validate(
 async def parse_resumes_endpoint(
     files: list[UploadFile] = File(...),
 ) -> JSONResponse:
-    """Parse one or more résumés into schema-conformant candidate records.
+    """Parse one or more resumes into schema-conformant candidate records.
 
     Accepted formats: ``.pdf``, ``.docx``, ``.txt``, ``.md``.
 
@@ -307,7 +309,7 @@ async def parse_resumes_endpoint(
     fed straight into ``/api/rank``.
     """
     if not files:
-        raise HTTPException(400, "supply at least one résumé file under `files`")
+        raise HTTPException(400, "supply at least one resume file under `files`")
 
     parsed: list[dict[str, Any]] = []
     errors: list[dict[str, str]] = []
@@ -439,7 +441,7 @@ async def rank(
 
     effective_top_k = min(top_k, _max_top_k(len(parsed)))
 
-    # Ranking is CPU-bound — offload to a worker thread so the FastAPI
+    # Ranking is CPU-bound - offload to a worker thread so the FastAPI
     # event loop continues serving other clients (health checks, etc.).
     # NOTE: rank_candidates declares top_k as kw-only, hence functools.partial.
     ranked = await asyncio.to_thread(
