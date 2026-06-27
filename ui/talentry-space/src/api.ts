@@ -5,8 +5,9 @@
  *     production behind the FastAPI static mount);
  *   • parse `application/json` *and* the FastAPI `{detail: ...}` error shape;
  *   • surface schema-validation failures (HTTP 422 from /api/rank) as a
- *     structured object — the UI uses this to render a green/red diff
- *     instead of a generic "request failed" toast.
+ *     structured object — the UI uses this to render a git diff style
+ *     report instead of a generic "request failed" toast.
+
  */
 
 import type {
