@@ -4,8 +4,9 @@ The FastAPI server (`talentry-serve` or the HuggingFace Space deployment) expose
 three endpoints. All payloads are JSON; the only non-JSON response is the
 CSV download.
 
-Live URL: `https://williyam-talentry-ai.hf.space`
+Live URL: `https://huggingface.co/spaces/williyam/talentry-ai`
 Repo on HF: `https://huggingface.co/spaces/williyam/talentry-ai`
+Open-source fine-tuned LLM: `https://huggingface.co/williyam/redrob-qwen-grpo`
 
 (the same origin serves the React SPA).
 
