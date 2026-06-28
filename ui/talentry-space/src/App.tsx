@@ -175,6 +175,23 @@ const App: React.FC = () => {
             breakdown. Scaled to <span className="font-mono">millions of candidates</span> with low latency, 0 LLM calls.
           </p>
 
+          <div className="mt-6 card p-4 sm:p-5 max-w-3xl border border-sky-400/30 bg-sky-500/5">
+            <p className="text-sm text-bone-200 leading-relaxed">
+              <span className="font-semibold text-sky-300">This Space uses no LLM.</span>{" "}
+              It runs the deterministic Talentry-AI ranker only. If you need an
+              LLM-flavoured candidate ranker, use the open-source GRPO-fine-tuned
+              Qwen3-0.6B checkpoint —{" "}
+              <a
+                href="https://huggingface.co/williyam/redrob-qwen-grpo"
+                target="_blank"
+                rel="noreferrer"
+                className="font-mono text-emerald-300 hover:text-emerald-200 underline underline-offset-2 decoration-emerald-400/40"
+              >
+                williyam/redrob-qwen-grpo
+              </a>
+              .
+            </p>
+          </div>
         </section>
 
         {/* ─── Run controls ──────────────────────────────────────────── */}
