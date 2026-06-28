@@ -16,3 +16,4 @@ outputs/**/scheduler.pt
 outputs/**/rng_state.pth
 outputs/**/training_args.bin
 outputs/**/checkpoint-*/
+outputs/_eval_cache/

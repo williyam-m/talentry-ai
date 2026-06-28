@@ -27,3 +27,7 @@ ui/talentry-space/tsconfig.tsbuildinfo
 
 # OS
 *.log
+
+# Top-level outputs/ from the RL subproject training (model checkpoints + sft tmp)
+# These live on the Hugging Face Hub, not in git.
+/outputs/
