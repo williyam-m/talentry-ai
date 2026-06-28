@@ -13,18 +13,19 @@
 > Discovery & Ranking Challenge.
 
 
-Talentry AI is a production-grade ranking engine that turns a 100K candidate
+Talentry AI is a production-grade ranking engine that turns a large candidate
 pool into a precise, defensible top-100 shortlist for a single job description.
+Scaled to **millions of candidates with low latency**.
 
 ## Production constraints
 
-| Constraint                | Talentry AI            |
-| ------------------------- | ---------------------- |
-| Runtime (100K candidates) | **< 90 sec.** (1 CPU)  |
-| Memory                    | **< 4 GB RAM**         |
-| GPU                       | **Not required**       |
-| Network during ranking    | **0 LLM calls**        |
-| Reproducibility           | `make submission`      |
+| Constraint                | Talentry AI                          |
+| ------------------------- | ------------------------------------ |
+| Scale                     | **Millions of candidates**, low latency |
+| Memory                    | **< 4 GB RAM**                       |
+| GPU                       | **Not required**                     |
+| Network during ranking    | **0 LLM calls**                      |
+| Reproducibility           | `make submission`                    |
 
 ## Why it is different
 
