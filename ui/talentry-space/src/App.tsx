@@ -172,7 +172,7 @@ const App: React.FC = () => {
           <p className="mt-5 text-base sm:text-lg text-bone-300 max-w-2xl">
             BM25 + TF-IDF hybrid ranking with schema-first ingestion, behavioural
             signals, honeypot detection and a fully explainable score
-            breakdown. 100K candidates in <span className="font-mono">&lt; 90 sec.</span>, 1 CPU, 0 LLM calls.
+            breakdown. Scaled to <span className="font-mono">millions of candidates</span> with low latency, 0 LLM calls.
           </p>
 
         </section>
