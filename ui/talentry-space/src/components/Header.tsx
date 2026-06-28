@@ -53,6 +53,15 @@ export const Header: React.FC<{ version?: string }> = ({ version }) => {
           >
             HF Space
           </a>
+          <a
+            className="relative hover:text-bone-50 transition-colors after:absolute after:left-0 after:-bottom-1 after:h-px after:w-0 after:bg-bone-50 after:transition-all hover:after:w-full"
+            href="https://huggingface.co/williyam/redrob-qwen-grpo"
+            target="_blank"
+            rel="noreferrer"
+            title="Open-source GRPO-fine-tuned Qwen3-0.6B for candidate ranking"
+          >
+            HF Model
+          </a>
           {version && (
             <span className="pill border-bone-400/60 text-bone-200 bg-bone-50/5">
               v{version}
