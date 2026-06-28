@@ -25,8 +25,8 @@ It explicitly down-weights:
 
 ## 2. Trying it without installing anything
 
-1. Open the live demo: **<https://williyam-talentry-ai.hf.space>**
-   (HF repo: <https://huggingface.co/spaces/williyam/talentry-ai>)
+1. Open the live demo: **<https://huggingface.co/spaces/williyam/talentry-ai>**
+   (Open-source fine-tuned LLM: <https://huggingface.co/williyam/redrob-qwen-grpo>)
 2. Click **"Feed sample candidates"**.
 3. You'll see the parsed JD card, a ranked-row table, and a per-candidate
    score breakdown with reasoning.
