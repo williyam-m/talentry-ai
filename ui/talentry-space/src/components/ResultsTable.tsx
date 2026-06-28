@@ -1,49 +1,11 @@
-import React, { useRef } from "react";
+import React from "react";
 import type { RankedRow } from "../types";
+import { useScrollIsolation } from "./useScrollIsolation";
 
 interface Props {
   rows: RankedRow[];
   onSelect: (row: RankedRow) => void;
   selectedId: string | null;
-}
-
-/**
- * Trap wheel scroll inside a scrollable container ONLY while it has more
- * content to reveal. The previous version stopped propagation even when the
- * container was not actually scrollable (records ended within the block),
- * which left the page frozen. The fix:
- *
- *   • If the container is not actually overflowing (scrollHeight ≈ clientHeight)
- *     we do nothing — the page (and Lenis) keep getting the wheel deltas.
- *   • If it IS overflowing but we are at the top edge scrolling up, or at the
- *     bottom edge scrolling down, we let the page take over (no preventDefault,
- *     no stopPropagation).
- *   • Otherwise we stop propagation so the page doesn't double-scroll while
- *     we're consuming the delta inside the box.
- */
-function useScrollIsolation<T extends HTMLElement>() {
-  const ref = useRef<T | null>(null);
-  const onWheel = (e: React.WheelEvent<T>) => {
-    const el = ref.current;
-    if (!el) return;
-    const { scrollTop, scrollHeight, clientHeight } = el;
-    const overflowing = scrollHeight - clientHeight > 1;
-    if (!overflowing) {
-      // Nothing to scroll inside — let the page handle it.
-      return;
-    }
-    const atTop = scrollTop <= 0;
-    const atBottom = scrollTop + clientHeight >= scrollHeight - 1;
-    if ((atTop && e.deltaY < 0) || (atBottom && e.deltaY > 0)) {
-      // We've hit an edge — release the wheel to the page so it can continue
-      // scrolling past the block.
-      return;
-    }
-    // We're consuming the delta inside the box; stop propagation so the page
-    // (and Lenis) don't also consume the same delta.
-    e.stopPropagation();
-  };
-  return { ref, onWheel };
 }
 
 export const ResultsTable: React.FC<Props> = ({ rows, onSelect, selectedId }) => {
