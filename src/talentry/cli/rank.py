@@ -39,7 +39,7 @@ def _build_parser() -> argparse.ArgumentParser:
         "--jd",
         type=Path,
         default=None,
-        help="Path to job description text file. Defaults to the bundled JD.",
+        help="Path to job description text file. Defaults to the default JD shipped with the package.",
     )
     p.add_argument(
         "--out",
