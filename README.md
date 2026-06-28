@@ -3,6 +3,7 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-black.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
 [![HF Space](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Space-black)](https://williyam-talentry-ai.hf.space)
+[![HF Model](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-redrob--qwen--grpo-black)](https://huggingface.co/williyam/redrob-qwen-grpo)
 
 > ### 🚀 Live demo: **https://williyam-talentry-ai.hf.space**
 > Drag-and-drop a `candidates.jsonl` + a JD (`.docx` / `.pdf` / `.txt` / `.md`)
