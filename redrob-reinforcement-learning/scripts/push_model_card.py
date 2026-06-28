@@ -90,13 +90,13 @@ def build_card(eval_data: dict) -> ModelCard:
 {metadata.to_yaml()}
 ---
 
-# 🦾 redrob-qwen-grpo
+# redrob-qwen-grpo
 
 > **`Qwen/Qwen3-0.6B` → GRPO-fine-tuned for explainable candidate ranking, under a rule-based reward model (no LLM-as-a-judge).**
 
-[![Open in Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Live%20demo-talentry--ai-black)](https://williyam-talentry-ai.hf.space)
-[![GitHub](https://img.shields.io/badge/GitHub-talentry--ai-black?logo=github)](https://github.com/williyam-m/talentry-ai)
-[![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](https://github.com/williyam-m/talentry-ai/blob/main/LICENSE)
+[![Open in Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Live%20demo-talentry--ai-FFD21E)](https://huggingface.co/spaces/williyam/talentry-ai)
+[![GitHub](https://img.shields.io/badge/GitHub-talentry--ai-181717?logo=github&logoColor=white)](https://github.com/williyam-m/talentry-ai)
+[![License: MIT](https://img.shields.io/badge/license-MIT-22C55E.svg)](https://github.com/williyam-m/talentry-ai/blob/main/LICENSE)
 
 This is the **open-source side-quest** of the [Talentry-AI](https://github.com/williyam-m/talentry-ai)
 submission to the **Redrob × Hack2Skill — India Runs** Data & AI Challenge.
@@ -109,7 +109,7 @@ this model.
 
 ---
 
-## TL;DR
+## Headline results
 
 | Metric                        | Baseline (`Qwen/Qwen3-0.6B`) | `redrob-qwen-grpo` | Δ |
 | ----------------------------- | --------------------------- | ------------------ | ------ |
