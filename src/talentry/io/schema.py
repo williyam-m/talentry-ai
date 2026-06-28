@@ -34,7 +34,7 @@ _SCHEMA_PATH = Path(__file__).resolve().parent.parent / "resources" / "candidate
 
 @lru_cache(maxsize=1)
 def load_schema() -> dict[str, Any]:
-    """Return the bundled candidate JSON-Schema (cached)."""
+    """Return the default candidate JSON-Schema (cached)."""
     if not _SCHEMA_PATH.exists():
         raise FileNotFoundError(
             f"candidate_schema.json missing from package resources at {_SCHEMA_PATH}"
