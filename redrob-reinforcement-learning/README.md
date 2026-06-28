@@ -26,14 +26,33 @@ beyond the model download.
 
 ## TL;DR results
 
-| Metric                         | Baseline (`Qwen3-0.6B`) | `redrob-qwen-grpo` |
-| ------------------------------ | ----------------------- | ------------------ |
-| Mean rule-based reward `[0,1]` | see `outputs/eval_metrics.json` | see `outputs/eval_metrics.json` |
-| Format-valid JSON output       | rarely produces valid JSON      | reliably produces valid JSON |
-| Hardware                       | M1 Pro 16 GB, MPS               | M1 Pro 16 GB, MPS  |
+The full eval numbers, both summary and per-component, are committed at
+[`outputs/eval_metrics.json`](outputs/eval_metrics.json) and mirrored on
+the Hugging Face model card.
+
+| Metric                          | Baseline (`Qwen3-0.6B`) | `redrob-qwen-grpo` |
+| ------------------------------- | ----------------------- | ------------------ |
+| Mean rule-based reward `[0,1]`  | see `outputs/eval_metrics.json` | see `outputs/eval_metrics.json` |
+| Format-valid JSON output rate   | very low (free-form text)       | high (reliable JSON) |
+| Hardware                        | M1 Pro 16 GB, MPS               | M1 Pro 16 GB, MPS  |
 
 The same evaluation set is used for both rows (deterministic, `seed=0`,
-24 episodes).
+10 episodes, `max_new_tokens=384`).
+
+### Pipeline (this is the *standard* GRPO recipe for small base models)
+
+1. **Baseline rollout** — `Qwen/Qwen3-0.6B` answers each prompt;
+   reward is computed by the rule-based reward model.
+2. **SFT warm-start** — 3 epochs of supervised fine-tuning on
+   *grounded* gold JSON answers built from the labels. Without this
+   the base model never emits valid JSON, so every group of GRPO
+   completions has identical reward → advantage is 0 → no gradient.
+3. **GRPO** — 30 steps with TRL's `GRPOTrainer`, group size 2,
+   KL `β = 0.02`, on the rule-based reward.
+4. **Eval rollout** — same prompts, same seed; we then compute
+   per-component deltas.
+5. **Push** — the final `policy + tokenizer + plots + eval JSON`
+   are pushed to [`williyam/redrob-qwen-grpo`](https://huggingface.co/williyam/redrob-qwen-grpo).
 
 ### Plots
 
