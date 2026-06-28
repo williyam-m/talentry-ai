@@ -179,8 +179,7 @@ const App: React.FC = () => {
             <p className="text-sm text-bone-200 leading-relaxed">
               <span className="font-semibold text-sky-300">This Space uses no LLM.</span>{" "}
               It runs the deterministic Talentry-AI ranker only. If you need an
-              LLM-flavoured candidate ranker, use the open-source GRPO-fine-tuned
-              Qwen3-0.6B checkpoint —{" "}
+              LLM-flavoured candidate ranker, use{" "}
               <a
                 href="https://huggingface.co/williyam/redrob-qwen-grpo"
                 target="_blank"
@@ -188,8 +187,8 @@ const App: React.FC = () => {
                 className="font-mono text-emerald-300 hover:text-emerald-200 underline underline-offset-2 decoration-emerald-400/40"
               >
                 williyam/redrob-qwen-grpo
-              </a>
-              .
+              </a>{" "}
+              (our open-source redrob GRPO-fine-tuned Qwen3-0.6B checkpoint).
             </p>
           </div>
         </section>
