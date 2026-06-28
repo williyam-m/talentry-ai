@@ -141,7 +141,7 @@ their rank.
   hallucinations). Each record is re-validated against the schema before
   being handed to the ranker.
 * **"Feed sample candidates"** - a one-click button to explore the UI
-  using the bundled 50-row fixture.
+  using the default 50-row fixture.
 * **Immersive 3D scroll guide** powered by React Three Fiber + Lenis smooth
   scrolling. As you scroll, the geometry morphs to illustrate the five
   pipeline stages (ingest -> validate -> understand -> signals -> ship)
@@ -160,7 +160,7 @@ their rank.
 | Verb | Path                   | Purpose                                          |
 | ---- | ---------------------- | ------------------------------------------------ |
 | GET  | `/api/health`          | Liveness + version + max upload cap.             |
-| GET  | `/api/schema`          | Returns the bundled `candidate_schema.json`.     |
+| GET  | `/api/schema`          | Returns the default `candidate_schema.json`.     |
 | GET  | `/api/sample`          | Returns up to 100 candidates from the fixture.   |
 | GET  | `/api/sample/download` | Streams the full fixture as a download.          |
 | POST | `/api/validate`        | Validates an upload, returns report + diff.      |
