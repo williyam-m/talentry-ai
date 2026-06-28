@@ -155,7 +155,7 @@ export const Storytelling: React.FC = () => {
       {/* ── Intro ──────────────────────────────────────────────────── */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 mb-10 md:mb-14">
         <div className="inline-flex items-center gap-2 pill border-bone-400/40 text-bone-300 bg-bone-50/5">
-          <span className="w-1.5 h-1.5 rounded-full bg-bone-50 animate-pulse" />
+          <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
           How Talentry works
         </div>
         <h2 className="mt-4 text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight bg-gradient-to-br from-bone-50 via-bone-100 to-bone-400 bg-clip-text text-transparent max-w-3xl">
