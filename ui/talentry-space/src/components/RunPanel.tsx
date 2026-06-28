@@ -3,7 +3,7 @@
  *
  * Three orthogonal ways to feed candidates to the API:
  *   1. Upload your own `.json/.jsonl/.jsonl.gz` (drag-and-drop).
- *   2. Click "Feed sample candidates" → uses the bundled fixture.
+ *   2. Click "Feed sample candidates" → uses the default fixture.
  *   3. Use the `prefilled` prop from the parent (e.g. resume parser).
  *
  * Schema-validation errors are NOT caught here - they bubble up to
@@ -117,7 +117,7 @@ export const RunPanel: React.FC<Props> = ({
         </h2>
         <p className="text-xs text-bone-400 mt-2 max-w-2xl">
           Drop your candidates file, or click <em>"Feed sample candidates"</em> to
-          explore with the bundled 50-row fixture. Every upload is validated
+          explore with the default 50-row fixture. Every upload is validated
           against the official Redrob schema first - mismatches surface as a
           git diff style report, not a stack trace.
         </p>
@@ -141,7 +141,7 @@ export const RunPanel: React.FC<Props> = ({
           hint={
             jd
               ? `Will rank against your uploaded JD`
-              : `If empty, the bundled Senior-AI-Engineer JD is used`
+              : `If empty, the default Senior-AI-Engineer JD is used`
           }
         />
 
@@ -181,7 +181,7 @@ export const RunPanel: React.FC<Props> = ({
           className="btn-ghost relative overflow-hidden disabled:opacity-50 group"
           disabled={busy}
           onClick={runSample}
-          title="Use the bundled 50-row sample to explore the UI"
+          title="Use the default 50-row sample to explore the UI"
         >
           {busy && mode === "sample" ? (
             <>
