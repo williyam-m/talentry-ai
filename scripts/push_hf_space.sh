@@ -37,8 +37,14 @@ fi
 TMP="$(mktemp -d -t talentry-hf.XXXXXX)"
 trap 'rm -rf "$TMP"' EXIT
 
-echo "→ Mirroring $ROOT to $TMP (tracked files only)"
-git ls-files | rsync -a --files-from=- "$ROOT/" "$TMP/"
+echo "→ Mirroring $ROOT to $TMP (tracked files only, excluding HF-hosted binaries)"
+# The redrob-reinforcement-learning/ subproject ships large binary plots that
+# the HF Space upload pipeline rejects. They already live on the model repo
+# (williyam/redrob-qwen-grpo), so we strip them from the Space mirror.
+git ls-files \
+  | grep -Ev '^redrob-reinforcement-learning/plots/.*\.(png|jpg|jpeg|gif|pdf)$' \
+  | grep -Ev '^redrob-reinforcement-learning/.*\.(safetensors|bin|pt|onnx)$' \
+  | rsync -a --files-from=- "$ROOT/" "$TMP/"
 
 echo "→ Prepending HF Space YAML header to README.md"
 cat "$ROOT/.hf_space_header.md" "$ROOT/README.md" > "$TMP/README.md"
