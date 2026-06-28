@@ -13,7 +13,7 @@ We do *not* use an LLM here, for two reasons:
 
 The parser is tolerant: it reads any JD-like text but knows specifically how
 to pull the right facts out of the Redrob Senior-AI-Engineer JD shipped with
-the hackathon bundle.
+the hackathon submission as the default JD.
 """
 
 from __future__ import annotations
@@ -112,7 +112,7 @@ def _read_path(path: Path) -> str:
     if suffix == ".pdf":
         from talentry.io.resume import _extract_pdf
         return _extract_pdf(path.read_bytes())
-    # Plain text — be permissive about encoding (the bundled JD ships
+    # Plain text — be permissive about encoding (the default JD ships
     # as UTF-8 but uploads may be cp1252 / latin-1).
     return path.read_text(encoding="utf-8", errors="replace")
 
@@ -153,7 +153,7 @@ def _extract_skills_from_section(text: str, section_markers: list[str], stop_mar
 def parse_job_description(jd: str | Path | None = None) -> JobRequirements:
     """Parse a free-text JD into :class:`JobRequirements`.
 
-    When called with ``None`` the bundled Senior-AI-Engineer JD text is used,
+    When called with ``None`` the default Senior-AI-Engineer JD text is used,
     so the API and CLI can be invoked without a JD file in trivial demos.
 
     Skill lists (must / nice / disqualifier) are extracted from the
@@ -164,14 +164,14 @@ def parse_job_description(jd: str | Path | None = None) -> JobRequirements:
     or already-extracted text), we treat it as the authoritative source.
     The default Senior-AI-Engineer JD is only used when ``jd is None`` or
     when the supplied text is blank. This guarantees the API/UI cannot
-    silently fall back to the bundled JD after a user uploaded their own.
+    silently fall back to the default JD after a user uploaded their own.
     """
     # Was the JD supplied by the caller (uploaded) vs. defaulted?
     caller_supplied = jd is not None and (not isinstance(jd, str) or jd.strip() != "")
     text = _read(jd)
     if not text.strip():
         # Pathological case: the upload decoded to whitespace. Fall back
-        # to the bundled JD rather than producing an empty parse.
+        # to the default JD rather than producing an empty parse.
         text = _DEFAULT_JD_TEXT
         caller_supplied = False
     lower = text.lower()
