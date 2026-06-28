@@ -37,7 +37,7 @@ const STEPS: StoryStep[] = [
   {
     id: "ingest",
     kicker: "01 · Ingest",
-    title: "Stream 100K candidates at line-rate",
+    title: "Stream millions of candidates at line-rate",
     body:
       "A zero-copy streaming loader pulls JSONL / JSON / JSONL.gz off disk one " +
       "record at a time and normalises each into a slotted dataclass mirroring " +
@@ -159,7 +159,7 @@ export const Storytelling: React.FC = () => {
           How Talentry works
         </div>
         <h2 className="mt-4 text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight bg-gradient-to-br from-bone-50 via-bone-100 to-bone-400 bg-clip-text text-transparent max-w-3xl">
-          100K resumes to a defensible shortlist. Every stage, instrumented.
+          Millions of resumes to a defensible shortlist with low latency. Every stage, instrumented.
         </h2>
         <p className="mt-4 text-bone-300 text-sm sm:text-base max-w-2xl">
           Scroll to walk the pipeline. The geometry on the right reshapes
