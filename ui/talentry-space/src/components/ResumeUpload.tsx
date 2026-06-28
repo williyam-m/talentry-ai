@@ -15,6 +15,7 @@ import { useDropzone } from "react-dropzone";
 import { motion, AnimatePresence } from "framer-motion";
 import { postParseResumes } from "../api";
 import type { ParseResumesResponse } from "../types";
+import { useScrollIsolation } from "./useScrollIsolation";
 
 interface Props {
   onParsed?: (file: File, response: ParseResumesResponse) => void;
@@ -168,53 +169,66 @@ export const ResumeUpload: React.FC<Props> = ({ onParsed }) => {
                 Download .json
               </button>
             </div>
-            <ul className="space-y-1.5 max-h-72 overflow-auto custom-scroll overscroll-contain" data-lenis-prevent>
-              {response.results.map((r, i) => {
-                const rec = r.record as Record<string, unknown>;
-                const profile = (rec.profile as Record<string, unknown>) || {};
-                return (
-                  <li
-                    key={i}
-                    className="card px-3 py-2 text-xs flex flex-wrap items-center justify-between gap-2"
-                  >
-                    <div className="min-w-0">
-                      <div className="font-mono text-bone-200 truncate">
-                        {r.filename || "(unnamed)"} · {String(rec.candidate_id)}
-                      </div>
-                      <div className="text-bone-400 text-[11px] truncate">
-                        {String(profile.anonymized_name || "Anonymous")} ·{" "}
-                        {String(profile.current_title || "")} ·{" "}
-                        {String(profile.years_of_experience ?? 0)} yrs
-                      </div>
-                    </div>
-                    <span
-                      className={`pill border ${
-                        r.schema_ok
-                          ? "border-emerald-400/40 text-emerald-200 bg-emerald-500/10"
-                          : "border-amber-400/40 text-amber-200 bg-amber-500/10"
-                      }`}
-                    >
-                      {r.schema_ok
-                        ? "schema ✓"
-                        : `${r.schema_errors.length} schema issues`}
-                    </span>
-                  </li>
-                );
-              })}
-              {response.errors.map((e, i) => (
-                <li
-                  key={`err-${i}`}
-                  className="card px-3 py-2 text-xs border-red-400/40 bg-red-500/10"
-                >
-                  <div className="font-mono text-red-200 truncate">{e.filename}</div>
-                  <div className="text-red-300 text-[11px]">{e.error}</div>
-                </li>
-              ))}
-            </ul>
+            <ResumeResultsList response={response} />
           </motion.div>
         )}
       </AnimatePresence>
     </section>
+  );
+};
+
+const ResumeResultsList: React.FC<{ response: ParseResumesResponse }> = ({ response }) => {
+  const scroll = useScrollIsolation<HTMLUListElement>();
+  return (
+    <ul
+      ref={scroll.ref}
+      onWheel={scroll.onWheel}
+      className="space-y-1.5 max-h-72 overflow-auto custom-scroll"
+      style={{ overscrollBehavior: "auto" }}
+      data-lenis-prevent
+    >
+      {response.results.map((r, i) => {
+        const rec = r.record as Record<string, unknown>;
+        const profile = (rec.profile as Record<string, unknown>) || {};
+        return (
+          <li
+            key={i}
+            className="card px-3 py-2 text-xs flex flex-wrap items-center justify-between gap-2"
+          >
+            <div className="min-w-0">
+              <div className="font-mono text-bone-200 truncate">
+                {r.filename || "(unnamed)"} · {String(rec.candidate_id)}
+              </div>
+              <div className="text-bone-400 text-[11px] truncate">
+                {String(profile.anonymized_name || "Anonymous")} ·{" "}
+                {String(profile.current_title || "")} ·{" "}
+                {String(profile.years_of_experience ?? 0)} yrs
+              </div>
+            </div>
+            <span
+              className={`pill border ${
+                r.schema_ok
+                  ? "border-emerald-400/40 text-emerald-200 bg-emerald-500/10"
+                  : "border-amber-400/40 text-amber-200 bg-amber-500/10"
+              }`}
+            >
+              {r.schema_ok
+                ? "schema ✓"
+                : `${r.schema_errors.length} schema issues`}
+            </span>
+          </li>
+        );
+      })}
+      {response.errors.map((e, i) => (
+        <li
+          key={`err-${i}`}
+          className="card px-3 py-2 text-xs border-red-400/40 bg-red-500/10"
+        >
+          <div className="font-mono text-red-200 truncate">{e.filename}</div>
+          <div className="text-red-300 text-[11px]">{e.error}</div>
+        </li>
+      ))}
+    </ul>
   );
 };
 
