@@ -112,7 +112,7 @@ export const RunPanel: React.FC<Props> = ({
     <section className="card-glow p-6 sm:p-8 transition-transform duration-500 hover:-translate-y-1">
       <header className="mb-5">
         <h2 className="text-sm uppercase tracking-widest text-bone-300 flex items-center gap-2">
-          <span className="inline-block w-2 h-2 rounded-full bg-bone-50 animate-pulse" />
+          <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
           Run the ranker
         </h2>
         <p className="text-xs text-bone-400 mt-2 max-w-2xl">
