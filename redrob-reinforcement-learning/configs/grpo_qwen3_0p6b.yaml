@@ -1,0 +1,59 @@
+# GRPO fine-tuning config for Qwen3-0.6B → redrob-qwen-grpo.
+#
+# Tuned for a 16 GB Apple Silicon (M1 Pro) machine using MPS. The notebook
+# reads this file at startup. Override any field by passing CLI args or
+# editing the cell.
+
+model:
+  name: "Qwen/Qwen3-0.6B"          # base model on the Hub
+  trust_remote_code: false
+  dtype: "float32"                  # float32 for MPS stability; bf16 on CUDA
+  attn_implementation: "eager"      # avoid flash-attn dep on Mac
+
+dataset:
+  candidates_path: "../data/raw/sample_candidates.json"
+  jd_path: "../configs/job_description.txt"
+  top_k: 15                          # gold-label cutoff inside the ranker
+  max_samples: 32                    # small for local laptop training
+  seed: 7
+  balance_classes: true
+
+reward:
+  w_format: 0.20
+  w_decision: 0.30
+  w_score: 0.15
+  w_reason: 0.15
+  w_length: 0.05
+  w_hallucination: 0.15
+  min_reasons: 2
+  max_reasons: 5
+  max_completion_chars: 1200
+  min_completion_chars: 30
+
+trainer:
+  output_dir: "../outputs/redrob-qwen-grpo"
+  num_generations: 4                 # candidates per prompt-group
+  per_device_train_batch_size: 1
+  gradient_accumulation_steps: 4
+  learning_rate: 5.0e-6
+  max_steps: 10                      # ~20 minutes on M1 Pro MPS
+  logging_steps: 1
+  save_steps: 10
+  max_prompt_length: 768
+  max_completion_length: 128
+  beta: 0.04                         # KL coefficient
+  temperature: 1.0
+  top_p: 0.95
+  seed: 7
+  bf16: false                        # MPS does not support bf16 well
+  fp16: false
+  gradient_checkpointing: false
+
+eval:
+  n_episodes: 12                     # baseline & post-train rollouts each
+  seed: 0
+
+hub:
+  repo_id: "williyam/redrob-qwen-grpo"
+  private: false
+  commit_message: "GRPO fine-tune of Qwen3-0.6B with rule-based reward"
