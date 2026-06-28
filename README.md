@@ -1,22 +1,22 @@
 # Talentry AI
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-22C55E.svg)](LICENSE)
 [![HF Space](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Space-FFD21E)](https://huggingface.co/spaces/williyam/talentry-ai)
 [![HF Model](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-redrob--qwen--grpo-FF6F00)](https://huggingface.co/williyam/redrob-qwen-grpo)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-22C55E.svg)](LICENSE)
 
-> ### Open-source fine-tuned LLM: **https://huggingface.co/williyam/redrob-qwen-grpo**
->
 > ### Live demo (Hugging Face Space): **https://huggingface.co/spaces/williyam/talentry-ai**
+>
+> ### Open-source fine-tuned LLM: **https://huggingface.co/williyam/redrob-qwen-grpo**
 >
 > Drag-and-drop a `candidates.jsonl` + a JD (`.docx` / `.pdf` / `.txt` / `.md`)
 > and get a ranked, explainable shortlist plus a downloadable `Ranked_shortlist.csv`
 > / `.xlsx` in seconds.
 >
 > The hosted Space ships a **deterministic, zero-LLM** ranker (BM25 + TF-IDF +
-> behavioural signals). If you want an **LLM-flavoured** candidate ranker, use
-> the open-source GRPO-fine-tuned Qwen3-0.6B checkpoint above —
-> [`williyam/redrob-qwen-grpo`](https://huggingface.co/williyam/redrob-qwen-grpo).
+> behavioural signals). If you need an **LLM-flavoured** candidate ranker,
+> use [`williyam/redrob-qwen-grpo`](https://huggingface.co/williyam/redrob-qwen-grpo)
+> (our open-source redrob GRPO-fine-tuned Qwen3-0.6B checkpoint).
 
 > Submission to the **Redrob x Hack2Skill - India Runs** Intelligent Candidate
 > Discovery & Ranking Challenge.
@@ -139,9 +139,9 @@ a live, drill-down dashboard that shows **why** each candidate landed at
 their rank.
 
 > ℹ️  The hosted Space uses **no LLM** — it runs the deterministic Talentry-AI
-> ranker (BM25 + TF-IDF + behavioural signals). If you specifically need an
-> LLM-flavoured ranker, plug in the open-source fine-tuned model
-> [`williyam/redrob-qwen-grpo`](https://huggingface.co/williyam/redrob-qwen-grpo).
+> ranker (BM25 + TF-IDF + behavioural signals). If you need an LLM-flavoured
+> ranker, use [`williyam/redrob-qwen-grpo`](https://huggingface.co/williyam/redrob-qwen-grpo)
+> (our open-source redrob GRPO-fine-tuned Qwen3-0.6B checkpoint).
 
 ## Open-source fine-tuned LLM — training results
 
