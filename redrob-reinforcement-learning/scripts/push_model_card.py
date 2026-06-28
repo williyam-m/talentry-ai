@@ -220,7 +220,16 @@ Total reward = convex combination (weights documented in the dataclass), so
 
 ## Plots
 
-The four committed plots are also pushed to this repo:
+The four training plots are committed to this repo and rendered inline below:
+
+<p align="center">
+  <img src="https://huggingface.co/williyam/redrob-qwen-grpo/resolve/main/training_curves.png" alt="Training curves" width="48%"/>
+  <img src="https://huggingface.co/williyam/redrob-qwen-grpo/resolve/main/baseline_vs_trained.png" alt="Baseline vs trained" width="48%"/>
+</p>
+<p align="center">
+  <img src="https://huggingface.co/williyam/redrob-qwen-grpo/resolve/main/reward_components.png" alt="Reward components" width="48%"/>
+  <img src="https://huggingface.co/williyam/redrob-qwen-grpo/resolve/main/reward_distribution.png" alt="Reward distribution" width="48%"/>
+</p>
 
 | File                          | Description                                                            |
 | ----------------------------- | ---------------------------------------------------------------------- |
