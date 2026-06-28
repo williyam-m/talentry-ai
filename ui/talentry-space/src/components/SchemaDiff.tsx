@@ -21,6 +21,7 @@ import type {
   SchemaErrorItem,
   ValidationReport,
 } from "../types";
+import { useScrollIsolation } from "./useScrollIsolation";
 
 interface Props {
   report?: ValidationReport;
@@ -100,10 +101,17 @@ const codeBadge: Record<SchemaErrorItem["code"], string> = {
 };
 
 const ErrorList: React.FC<{ errors: SchemaErrorItem[] }> = ({ errors }) => {
+  const scroll = useScrollIsolation<HTMLUListElement>();
   if (!errors.length)
     return <p className="text-sm text-emerald-300">No schema errors. ✓</p>;
   return (
-    <ul className="space-y-2 max-h-[50vh] overflow-auto custom-scroll pr-1 overscroll-contain" data-lenis-prevent>
+    <ul
+      ref={scroll.ref}
+      onWheel={scroll.onWheel}
+      className="space-y-2 max-h-[50vh] overflow-auto custom-scroll pr-1"
+      style={{ overscrollBehavior: "auto" }}
+      data-lenis-prevent
+    >
       {errors.map((e, i) => (
         <li
           key={i}
@@ -156,8 +164,15 @@ const FieldDiff: React.FC<{ lines: DiffLine[] }> = ({ lines }) => {
       }),
     [lines]
   );
+  const scroll = useScrollIsolation<HTMLDivElement>();
   return (
-    <div className="max-h-[55vh] overflow-auto custom-scroll border border-red-500/20 rounded bg-ink-950/70 font-mono text-[12px] leading-relaxed overscroll-contain" data-lenis-prevent>
+    <div
+      ref={scroll.ref}
+      onWheel={scroll.onWheel}
+      className="max-h-[55vh] overflow-auto custom-scroll border border-red-500/20 rounded bg-ink-950/70 font-mono text-[12px] leading-relaxed"
+      style={{ overscrollBehavior: "auto" }}
+      data-lenis-prevent
+    >
       {sorted.map((line, i) => (
         <DiffRow key={i} line={line} />
       ))}
@@ -217,8 +232,15 @@ const RawDiff: React.FC<{ expected: unknown; actual: unknown }> = ({
   actual,
 }) => {
   const parts = useMemo(() => diffJson(expected ?? {}, actual ?? {}), [expected, actual]);
+  const scroll = useScrollIsolation<HTMLPreElement>();
   return (
-    <pre className="max-h-[55vh] overflow-auto custom-scroll text-[11.5px] leading-snug font-mono bg-ink-950/70 border border-red-500/20 rounded p-3 overscroll-contain" data-lenis-prevent>
+    <pre
+      ref={scroll.ref}
+      onWheel={scroll.onWheel}
+      className="max-h-[55vh] overflow-auto custom-scroll text-[11.5px] leading-snug font-mono bg-ink-950/70 border border-red-500/20 rounded p-3"
+      style={{ overscrollBehavior: "auto" }}
+      data-lenis-prevent
+    >
       {parts.map((part, i) => {
         const cls = part.added
           ? "bg-emerald-500/10 text-emerald-100"
