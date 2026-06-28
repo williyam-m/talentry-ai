@@ -213,6 +213,8 @@ def main(cfg_path: str, *, push_to_hub: bool = False) -> Dict[str, Any]:
         bf16=bool(tcfg.get("bf16", False)),
         fp16=bool(tcfg.get("fp16", False)),
         gradient_checkpointing=bool(tcfg.get("gradient_checkpointing", False)),
+        gradient_checkpointing_kwargs={"use_reentrant": False}
+            if tcfg.get("gradient_checkpointing", False) else None,
         seed=int(tcfg.get("seed", 7)),
         report_to="none",
         remove_unused_columns=False,
