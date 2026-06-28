@@ -1,0 +1,18 @@
+__pycache__/
+*.pyc
+.venv*/
+.ipynb_checkpoints/
+.DS_Store
+
+# Training artefacts: we keep plots/, outputs/eval_metrics.json and
+# data/processed/train.jsonl, but big binary checkpoints are too large
+# for the repo - they live on the Hugging Face Hub instead.
+outputs/redrob-qwen-grpo/*.bin
+outputs/redrob-qwen-grpo/*.safetensors
+outputs/redrob-qwen-grpo/*.pt
+outputs/redrob-qwen-grpo-smoke/
+outputs/**/optimizer.pt
+outputs/**/scheduler.pt
+outputs/**/rng_state.pth
+outputs/**/training_args.bin
+outputs/**/checkpoint-*/
