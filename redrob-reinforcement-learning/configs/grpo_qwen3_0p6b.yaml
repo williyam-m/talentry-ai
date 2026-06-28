@@ -32,25 +32,25 @@ reward:
 
 trainer:
   output_dir: "../outputs/redrob-qwen-grpo"
-  num_generations: 4                 # candidates per prompt-group
+  num_generations: 2                 # candidates per prompt-group (small group = less memory)
   per_device_train_batch_size: 1
-  gradient_accumulation_steps: 4
+  gradient_accumulation_steps: 2
   learning_rate: 5.0e-6
-  max_steps: 10                      # ~20 minutes on M1 Pro MPS
+  max_steps: 10                      # ~30-45 minutes on M1 Pro MPS with grad-ckpt
   logging_steps: 1
   save_steps: 10
-  max_prompt_length: 768
-  max_completion_length: 128
+  max_prompt_length: 512
+  max_completion_length: 96
   beta: 0.04                         # KL coefficient
   temperature: 1.0
   top_p: 0.95
   seed: 7
   bf16: false                        # MPS does not support bf16 well
   fp16: false
-  gradient_checkpointing: false
+  gradient_checkpointing: true       # essential to fit Qwen3-0.6B + activations on 16GB MPS
 
 eval:
-  n_episodes: 12                     # baseline & post-train rollouts each
+  n_episodes: 10                     # baseline & post-train rollouts each
   seed: 0
 
 hub:
