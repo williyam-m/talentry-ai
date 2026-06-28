@@ -36,7 +36,7 @@ It explicitly down-weights:
 1. Drop your `candidates.jsonl` (or `.json` / `.jsonl.gz`) onto the
    **Candidates** dropzone.
 2. (Optional) Drop a custom job description: `.txt` / `.md` / `.docx` / `.pdf`.
-   If left empty, the bundled Senior-AI-Engineer JD is used.
+   If left empty, the default Senior-AI-Engineer JD is used.
 3. Set **Top-K = 100** if you want the validator-clean submission file.
 4. Click **"Rank uploaded pool"**; download either `Ranked_shortlist.csv`
    (validator-clean) or `Ranked_shortlist.xlsx` (styled for human review).
