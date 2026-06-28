@@ -44,6 +44,7 @@ from .plotting import (
     plot_training_curves,
 )
 from .reward import RuleBasedRewardModel, make_trl_reward_fn
+from .sft import run_sft
 
 
 # --------------------------------------------------------------------------- #
@@ -161,10 +162,35 @@ def main(cfg_path: str, *, push_to_hub: bool = False) -> Dict[str, Any]:
     print("[redrob-rl] running baseline rollout …")
     eval_n = int(cfg["eval"]["n_episodes"])
     baseline_policy = _make_policy(base_model, tokenizer, device,
-                                   max_new_tokens=160, temperature=0.0)
+                                   max_new_tokens=384, temperature=0.0)
     base_eval = rollout(env, lambda p: _strip_thinking(baseline_policy(p)),
                         n_episodes=eval_n, seed=cfg["eval"]["seed"])
     print(f"[redrob-rl] baseline mean reward: {base_eval['mean_reward']:.4f}")
+
+    # ----- 3b. SFT warm-start --------------------------------------------- #
+    sft_cfg = cfg.get("sft", {})
+    if sft_cfg.get("enabled", True):
+        print("[redrob-rl] === SFT warm-start (gold JSON answers) ===")
+        run_sft(
+            model=base_model,
+            tokenizer=tokenizer,
+            samples=samples,
+            output_dir=out_dir.parent / "sft-tmp",
+            epochs=int(sft_cfg.get("epochs", 2)),
+            batch_size=int(sft_cfg.get("batch_size", 1)),
+            grad_accum=int(sft_cfg.get("grad_accum", 2)),
+            learning_rate=float(sft_cfg.get("learning_rate", 1.0e-5)),
+            max_length=int(sft_cfg.get("max_length", 1024)),
+            seed=int(cfg["trainer"].get("seed", 7)),
+        )
+        # Quick post-SFT eval so the plot has 3 points (base, SFT, GRPO).
+        sft_policy = _make_policy(base_model, tokenizer, device,
+                                  max_new_tokens=384, temperature=0.0)
+        sft_eval = rollout(env, lambda p: _strip_thinking(sft_policy(p)),
+                           n_episodes=eval_n, seed=cfg["eval"]["seed"])
+        print(f"[redrob-rl] post-SFT mean reward: {sft_eval['mean_reward']:.4f}")
+    else:
+        sft_eval = None
 
     # ----- 4. GRPO training ------------------------------------------------ #
     from trl import GRPOConfig, GRPOTrainer
@@ -242,7 +268,7 @@ def main(cfg_path: str, *, push_to_hub: bool = False) -> Dict[str, Any]:
     # ----- 5. trained rollout --------------------------------------------- #
     print("[redrob-rl] running trained-policy rollout …")
     trained_policy = _make_policy(trainer.model, tokenizer, device,
-                                  max_new_tokens=160, temperature=0.0)
+                                  max_new_tokens=384, temperature=0.0)
     env_trained = CandidateRankEnv(samples, reward_model, sequential=True)
     trained_eval = rollout(env_trained,
                            lambda p: _strip_thinking(trained_policy(p)),
@@ -271,6 +297,13 @@ def main(cfg_path: str, *, push_to_hub: bool = False) -> Dict[str, Any]:
     print(f"[redrob-rl] saved plots: {p1.name}, {p2.name}, {p3.name}, {p4.name}")
 
     # ----- 7. metrics summary --------------------------------------------- #
+    def _comp_mean(breakdowns):
+        if not breakdowns:
+            return {}
+        keys = list(breakdowns[0].keys())
+        return {k: float(sum(b[k] for b in breakdowns) / len(breakdowns))
+                for k in keys}
+
     metrics = {
         "device": str(device),
         "model": model_name,
@@ -278,6 +311,11 @@ def main(cfg_path: str, *, push_to_hub: bool = False) -> Dict[str, Any]:
         "baseline_mean_reward": base_eval["mean_reward"],
         "trained_mean_reward": trained_eval["mean_reward"],
         "uplift": trained_eval["mean_reward"] - base_eval["mean_reward"],
+        "baseline_components_mean": _comp_mean(base_eval["breakdowns"]),
+        "trained_components_mean": _comp_mean(trained_eval["breakdowns"]),
+        "baseline_rewards": list(base_eval["rewards"]),
+        "trained_rewards": list(trained_eval["rewards"]),
+        "post_sft_mean_reward": float(sft_eval["mean_reward"]) if sft_eval else None,
         "train_seconds": train_secs,
         "max_steps": int(tcfg["max_steps"]),
         "num_generations": int(tcfg["num_generations"]),
