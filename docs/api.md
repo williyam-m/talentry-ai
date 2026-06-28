@@ -1,6 +1,6 @@
 # Talentry AI - HTTP API
 
-The FastAPI server (`talentry-serve` or the bundled HuggingFace Space) exposes
+The FastAPI server (`talentry-serve` or the HuggingFace Space deployment) exposes
 three endpoints. All payloads are JSON; the only non-JSON response is the
 CSV download.
 
@@ -23,7 +23,7 @@ Liveness probe.
 
 ## `GET /api/sample?limit=10`
 
-Return up to `limit` candidate records from the bundled 50-row fixture
+Return up to `limit` candidate records from the default 50-row fixture
 (`data/raw/sample_candidates.json`). Useful for UI bootstrapping.
 
 `limit` is clamped to `[1, 100]`. Returns an array of raw candidate dicts
@@ -40,13 +40,13 @@ Run the full ranking pipeline.
 | Field        | Required             | Notes                                                |
 | ------------ | -------------------- | ---------------------------------------------------- |
 | `candidates` | yes unless `use_sample=true` | `.json` / `.jsonl` / `.jsonl.gz` upload     |
-| `jd`         | no                   | `.txt` / `.md`; defaults to the bundled JD           |
+| `jd`         | no                   | `.txt` / `.md`; defaults to the default JD           |
 
 **Query parameters:**
 
 | Name         | Default | Notes                                                         |
 | ------------ | ------- | ------------------------------------------------------------- |
-| `use_sample` | `false` | If true, ignores `candidates` and uses the bundled fixture.   |
+| `use_sample` | `false` | If true, ignores `candidates` and uses the default fixture.   |
 | `top_k`      | `10`    | Clamped to `[1, 100]`. Validator-clean CSV only at `top_k=100`. |
 
 **Response:**
