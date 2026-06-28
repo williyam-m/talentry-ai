@@ -1,14 +1,22 @@
 # Talentry AI
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-black.svg)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
-[![HF Space](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Space-black)](https://williyam-talentry-ai.hf.space)
-[![HF Model](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-redrob--qwen--grpo-black)](https://huggingface.co/williyam/redrob-qwen-grpo)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-22C55E.svg)](LICENSE)
+[![HF Space](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Space-FFD21E)](https://huggingface.co/spaces/williyam/talentry-ai)
+[![HF Model](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-redrob--qwen--grpo-FF6F00)](https://huggingface.co/williyam/redrob-qwen-grpo)
 
-> ### 🚀 Live demo: **https://williyam-talentry-ai.hf.space**
+> ### Open-source fine-tuned LLM: **https://huggingface.co/williyam/redrob-qwen-grpo**
+>
+> ### Live demo (Hugging Face Space): **https://huggingface.co/spaces/williyam/talentry-ai**
+>
 > Drag-and-drop a `candidates.jsonl` + a JD (`.docx` / `.pdf` / `.txt` / `.md`)
 > and get a ranked, explainable shortlist plus a downloadable `Ranked_shortlist.csv`
 > / `.xlsx` in seconds.
+>
+> The hosted Space ships a **deterministic, zero-LLM** ranker (BM25 + TF-IDF +
+> behavioural signals). If you want an **LLM-flavoured** candidate ranker, use
+> the open-source GRPO-fine-tuned Qwen3-0.6B checkpoint above —
+> [`williyam/redrob-qwen-grpo`](https://huggingface.co/williyam/redrob-qwen-grpo).
 
 > Submission to the **Redrob x Hack2Skill - India Runs** Intelligent Candidate
 > Discovery & Ranking Challenge.
@@ -122,13 +130,35 @@ python validate_submission.py data/output/submission.csv
 
 React (Vite + TypeScript + Tailwind) frontend backed by FastAPI:
 
-* **App URL:** https://williyam-talentry-ai.hf.space
+* **App URL:** https://huggingface.co/spaces/williyam/talentry-ai
 * **Repo on HF:** https://huggingface.co/spaces/williyam/talentry-ai
 
 It accepts a candidate sample (<= 100 candidates) via upload or a one-click
 preloaded fixture and produces a `Ranked_shortlist.{csv,xlsx}` download plus
 a live, drill-down dashboard that shows **why** each candidate landed at
 their rank.
+
+> ℹ️  The hosted Space uses **no LLM** — it runs the deterministic Talentry-AI
+> ranker (BM25 + TF-IDF + behavioural signals). If you specifically need an
+> LLM-flavoured ranker, plug in the open-source fine-tuned model
+> [`williyam/redrob-qwen-grpo`](https://huggingface.co/williyam/redrob-qwen-grpo).
+
+## Open-source fine-tuned LLM — training results
+
+A sibling project, [`redrob-reinforcement-learning/`](redrob-reinforcement-learning/),
+GRPO-fine-tunes `Qwen/Qwen3-0.6B` on the same ranking task under a rule-based
+reward model (no LLM-as-a-judge). The resulting checkpoint is published as
+[`williyam/redrob-qwen-grpo`](https://huggingface.co/williyam/redrob-qwen-grpo).
+
+<p align="center">
+  <img src="redrob-reinforcement-learning/plots/training_curves.png" alt="Training curves" width="48%"/>
+  <img src="redrob-reinforcement-learning/plots/baseline_vs_trained.png" alt="Baseline vs trained" width="48%"/>
+</p>
+<p align="center">
+  <img src="redrob-reinforcement-learning/plots/reward_components.png" alt="Reward components" width="48%"/>
+  <img src="redrob-reinforcement-learning/plots/reward_distribution.png" alt="Reward distribution" width="48%"/>
+</p>
+<p align="center"><em>Top-left: mean reward (left axis) + GRPO loss (right axis) vs step. Top-right: per-episode reward, baseline vs trained, same eval rollout. Bottom-left: mean reward per rule-based component. Bottom-right: histogram of eval rewards.</em></p>
 
 
 ### v1.1 - Production hardening
