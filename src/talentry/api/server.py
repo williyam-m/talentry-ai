@@ -3,7 +3,7 @@
 The server is deliberately stateless. Each ``POST /api/rank`` invocation:
 
   1. Parses the optional JD text from the multipart body (falls back to
-     the bundled Senior-AI-Engineer JD if absent).
+     the default Senior-AI-Engineer JD if absent).
   2. Loads the uploaded candidates file (`.json`, `.jsonl`, `.jsonl.gz`).
   3. Runs the full Talentry pipeline.
   4. Returns the ranked top-K plus the full :class:`ScoreBreakdown` JSON
@@ -203,15 +203,15 @@ def health() -> dict[str, Any]:
 
 @app.get("/api/schema")
 def schema() -> JSONResponse:
-    """Return the bundled candidate JSON-Schema (for the UI's docs panel)."""
+    """Return the default candidate JSON-Schema (for the UI's docs panel)."""
     return JSONResponse(load_schema())
 
 
 @app.get("/api/sample")
 def sample(limit: int = Query(10, ge=1, le=100)) -> JSONResponse:
-    """Return up to `limit` candidates from the bundled fixture."""
+    """Return up to `limit` candidates from the default fixture."""
     if _SAMPLE_FIXTURE is None:
-        raise HTTPException(404, "sample fixture not bundled in this deployment")
+        raise HTTPException(404, "sample fixture not included in this deployment")
     out: list[dict[str, Any]] = []
     try:
         for i, rec in enumerate(iter_candidate_records(_SAMPLE_FIXTURE)):
@@ -225,9 +225,9 @@ def sample(limit: int = Query(10, ge=1, le=100)) -> JSONResponse:
 
 @app.get("/api/sample/download")
 def sample_download() -> FileResponse:
-    """Stream the bundled sample_candidates.json as a downloadable file."""
+    """Stream the default sample_candidates.json as a downloadable file."""
     if _SAMPLE_FIXTURE is None:
-        raise HTTPException(404, "sample fixture not bundled")
+        raise HTTPException(404, "sample fixture not included")
     return FileResponse(
         _SAMPLE_FIXTURE,
         media_type="application/json",
@@ -294,7 +294,7 @@ async def validate(
 
     if use_sample:
         if _SAMPLE_FIXTURE is None:
-            raise HTTPException(404, "sample fixture not bundled")
+            raise HTTPException(404, "sample fixture not included")
         records = list(iter_candidate_records(_SAMPLE_FIXTURE))
     else:
         if candidates is None:
@@ -391,7 +391,7 @@ async def rank(
 
     The request can supply candidates via:
       * ``candidates`` multipart upload (.json/.jsonl/.jsonl.gz), OR
-      * ``use_sample=true`` to use the bundled fixture.
+      * ``use_sample=true`` to use the default fixture.
 
     By default we validate the upload against the official schema and
     refuse to rank obviously malformed inputs (with a structured diff in
@@ -415,7 +415,7 @@ async def rank(
 
     if use_sample:
         if _SAMPLE_FIXTURE is None:
-            raise HTTPException(404, "sample fixture not bundled")
+            raise HTTPException(404, "sample fixture not included")
         raw_records = list(iter_candidate_records(_SAMPLE_FIXTURE))
         cache_key = f"sample:{top_k}:jd={jd_digest}"
     else:
@@ -474,7 +474,7 @@ async def rank(
     # the file format.
     #
     # NOTE: when the user uploaded a JD we must NEVER silently fall back
-    # to the bundled default. If decoding produces empty text we raise
+    # to the default JD. If decoding produces empty text we raise
     # HTTP 422 so the UI surfaces the problem instead of returning a
     # ranking that quietly used the default JD.
     jd_text: str | None = None
@@ -506,7 +506,7 @@ async def rank(
             extra={"request_id": rid},
         )
     else:
-        _LOG.info("rank: no JD uploaded — using bundled default", extra={"request_id": rid})
+        _LOG.info("rank: no JD uploaded — using default JD", extra={"request_id": rid})
 
 
 
@@ -619,7 +619,7 @@ def submission_xlsx(session: str = Query(...)) -> FileResponse:
     return FileResponse(
         xlsx_path,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        filename="submission.xlsx",
+        filename="Ranked_shortlist.xlsx",
     )
 
 
