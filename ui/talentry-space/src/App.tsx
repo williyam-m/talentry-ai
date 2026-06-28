@@ -256,6 +256,34 @@ const App: React.FC = () => {
         </div>
       </main>
 
+      <section className="relative z-10 mx-auto max-w-7xl w-full px-4 sm:px-6 pb-10">
+        <div className="rounded-2xl border border-bone-400/20 bg-gradient-to-br from-ink-900/80 via-ink-950/70 to-ink-900/80 backdrop-blur-xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+          <div className="space-y-2 max-w-3xl">
+            <p className="text-[10px] uppercase tracking-[0.25em] text-bone-400">
+              Open-source side-quest · GRPO
+            </p>
+            <h3 className="text-lg md:text-xl font-semibold text-bone-50">
+              Want an LLM-flavoured candidate ranker?
+            </h3>
+            <p className="text-sm text-bone-300 leading-relaxed">
+              We GRPO-fine-tuned <span className="font-mono text-bone-100">Qwen3-0.6B</span> on
+              this very task using a rule-based reward model — no LLM-as-a-judge.
+              Pull <span className="font-mono text-bone-100">redrob-qwen-grpo</span> from the
+              Hugging Face Hub and plug it into your own pipeline. The Talentry-AI submission
+              itself runs without any LLM; this checkpoint is a free, opt-in extra.
+            </p>
+          </div>
+          <a
+            href="https://huggingface.co/williyam/redrob-qwen-grpo"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 rounded-xl border border-bone-400/40 bg-bone-50/5 hover:bg-bone-50/10 transition-colors px-5 py-3 text-sm font-medium text-bone-50 whitespace-nowrap"
+          >
+            🤗 Open on Hugging Face →
+          </a>
+        </div>
+      </section>
+
       <footer className="relative z-10 border-t hairline text-[11px] text-bone-400 px-4 sm:px-6 py-5 mx-auto max-w-7xl w-full flex flex-wrap justify-between gap-3">
         <span>Engineered for explainable, low-latency hiring.</span>
         <span className="font-mono">
