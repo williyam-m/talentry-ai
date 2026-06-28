@@ -1,12 +1,13 @@
-# 🦾 redrob-reinforcement-learning
+# redrob-reinforcement-learning
 
 > Reinforcement-Learning environment + **GRPO** fine-tuning pipeline that turns
 > `Qwen/Qwen3-0.6B` into **[`williyam/redrob-qwen-grpo`](https://huggingface.co/williyam/redrob-qwen-grpo)**
 > – an open-source candidate-ranking LLM for the Talentry-AI / Redrob task.
 
-[![🤗 Model](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-redrob--qwen--grpo-black)](https://huggingface.co/williyam/redrob-qwen-grpo)
-[![Python](https://img.shields.io/badge/python-3.10+-black.svg)](https://www.python.org/)
-[![License](https://img.shields.io/badge/license-MIT-black.svg)](../LICENSE)
+[![🤗 Model](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-redrob--qwen--grpo-FF6F00)](https://huggingface.co/williyam/redrob-qwen-grpo)
+[![🤗 Space](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-talentry--ai%20Space-FFD21E)](https://huggingface.co/spaces/williyam/talentry-ai)
+[![Python](https://img.shields.io/badge/python-3.10+-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-22C55E.svg)](../LICENSE)
 
 ---
 
@@ -24,7 +25,7 @@ beyond the model download.
 
 ---
 
-## TL;DR results
+## Results summary
 
 The full eval numbers, both summary and per-component, are committed at
 [`outputs/eval_metrics.json`](outputs/eval_metrics.json) and mirrored on
