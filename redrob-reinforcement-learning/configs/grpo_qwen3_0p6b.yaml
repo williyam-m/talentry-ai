@@ -35,19 +35,27 @@ trainer:
   num_generations: 2                 # candidates per prompt-group (small group = less memory)
   per_device_train_batch_size: 1
   gradient_accumulation_steps: 2
-  learning_rate: 5.0e-6
-  max_steps: 10                      # ~30-45 minutes on M1 Pro MPS with grad-ckpt
+  learning_rate: 1.0e-4              # aggressive LR for short laptop training so updates actually move the policy
+  max_steps: 30                      # ~20-25 minutes on M1 Pro MPS with grad-ckpt
   logging_steps: 1
-  save_steps: 10
-  max_prompt_length: 512
-  max_completion_length: 96
-  beta: 0.04                         # KL coefficient
-  temperature: 1.0
+  save_steps: 30
+  max_prompt_length: 768
+  max_completion_length: 320         # /no_think + minified JSON usually finishes well under this
+  beta: 0.02                         # KL coefficient (lower → policy can move further from base)
+  temperature: 1.2                   # higher temp -> bigger spread in the 2 generations -> non-zero advantage
   top_p: 0.95
   seed: 7
   bf16: false                        # MPS does not support bf16 well
   fp16: false
   gradient_checkpointing: true       # essential to fit Qwen3-0.6B + activations on 16GB MPS
+
+sft:
+  enabled: true                      # SFT warm-start with gold JSON answers
+  epochs: 3
+  batch_size: 1
+  grad_accum: 4
+  learning_rate: 2.0e-5
+  max_length: 1024
 
 eval:
   n_episodes: 10                     # baseline & post-train rollouts each
