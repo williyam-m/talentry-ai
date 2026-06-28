@@ -1,0 +1,54 @@
+# Smoke-test config: very few steps & samples to verify end-to-end wiring.
+model:
+  name: "Qwen/Qwen3-0.6B"
+  trust_remote_code: false
+  dtype: "float32"
+  attn_implementation: "eager"
+
+dataset:
+  candidates_path: "./data/raw/sample_candidates.json"
+  jd_path: "./configs/job_description.txt"
+  top_k: 12
+  max_samples: 12
+  seed: 7
+  balance_classes: true
+
+reward:
+  w_format: 0.20
+  w_decision: 0.30
+  w_score: 0.15
+  w_reason: 0.15
+  w_length: 0.05
+  w_hallucination: 0.15
+  min_reasons: 2
+  max_reasons: 5
+  max_completion_chars: 1200
+  min_completion_chars: 30
+
+trainer:
+  output_dir: "./outputs/redrob-qwen-grpo-smoke"
+  num_generations: 2
+  per_device_train_batch_size: 1
+  gradient_accumulation_steps: 2
+  learning_rate: 1.0e-6
+  max_steps: 2
+  logging_steps: 1
+  save_steps: 2
+  max_prompt_length: 1024
+  max_completion_length: 128
+  beta: 0.04
+  temperature: 0.8
+  top_p: 0.95
+  seed: 7
+  bf16: false
+  fp16: false
+  gradient_checkpointing: false
+
+eval:
+  n_episodes: 4
+  seed: 0
+
+hub:
+  repo_id: "williyam/redrob-qwen-grpo"
+  private: false
+  commit_message: "smoke"
