@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "redrob-rl"
+version = "0.1.0"
+description = "Reinforcement-Learning environment + GRPO fine-tuning for Qwen3-0.6B (redrob-qwen-grpo)."
+authors = [{ name = "Williyam M" }]
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+keywords = ["reinforcement-learning", "grpo", "qwen", "candidate-ranking", "trl"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "torch>=2.2",
+    "transformers>=4.45",
+    "trl>=0.11",
+    "peft>=0.13",
+    "datasets>=2.20",
+    "accelerate>=0.34",
+    "matplotlib>=3.8",
+    "numpy<2",
+    "huggingface_hub>=0.24",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+notebook = ["jupyter", "ipykernel", "ipywidgets"]
+dev = ["pytest>=8", "ruff>=0.5"]
+
+[project.scripts]
+redrob-grpo = "redrob_rl.train:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
