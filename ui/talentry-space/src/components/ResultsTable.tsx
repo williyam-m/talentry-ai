@@ -8,15 +8,18 @@ interface Props {
 }
 
 /**
- * Trap wheel + touch scroll inside a scrollable container so that when the
- * user reaches the top or bottom edge the *page* does not start scrolling.
+ * Trap wheel scroll inside a scrollable container ONLY while it has more
+ * content to reveal. The previous version stopped propagation even when the
+ * container was not actually scrollable (records ended within the block),
+ * which left the page frozen. The fix:
  *
- * `overscroll-behavior: contain` (the CSS-only fix) is honoured by Chrome
- * and Safari but is famously inconsistent on macOS trackpads with inertial
- * scrolling, and Lenis can still pick the wheel event up before the browser
- * applies overscroll-contain. We additionally cancel any wheel delta that
- * would attempt to scroll *past* the container's edges. This is the same
- * pattern used by Linear, Notion's command palette, etc.
+ *   • If the container is not actually overflowing (scrollHeight ≈ clientHeight)
+ *     we do nothing — the page (and Lenis) keep getting the wheel deltas.
+ *   • If it IS overflowing but we are at the top edge scrolling up, or at the
+ *     bottom edge scrolling down, we let the page take over (no preventDefault,
+ *     no stopPropagation).
+ *   • Otherwise we stop propagation so the page doesn't double-scroll while
+ *     we're consuming the delta inside the box.
  */
 function useScrollIsolation<T extends HTMLElement>() {
   const ref = useRef<T | null>(null);
@@ -24,17 +27,21 @@ function useScrollIsolation<T extends HTMLElement>() {
     const el = ref.current;
     if (!el) return;
     const { scrollTop, scrollHeight, clientHeight } = el;
+    const overflowing = scrollHeight - clientHeight > 1;
+    if (!overflowing) {
+      // Nothing to scroll inside — let the page handle it.
+      return;
+    }
     const atTop = scrollTop <= 0;
     const atBottom = scrollTop + clientHeight >= scrollHeight - 1;
-    // Block bubble-up only when trying to scroll past an edge.
     if ((atTop && e.deltaY < 0) || (atBottom && e.deltaY > 0)) {
-      e.preventDefault();
-      e.stopPropagation();
-    } else {
-      // Inside the box — stop propagation so the page (and Lenis) don't
-      // also consume the same delta.
-      e.stopPropagation();
+      // We've hit an edge — release the wheel to the page so it can continue
+      // scrolling past the block.
+      return;
     }
+    // We're consuming the delta inside the box; stop propagation so the page
+    // (and Lenis) don't also consume the same delta.
+    e.stopPropagation();
   };
   return { ref, onWheel };
 }
@@ -47,13 +54,13 @@ export const ResultsTable: React.FC<Props> = ({ rows, onSelect, selectedId }) =>
       <h2 className="text-sm uppercase tracking-widest text-bone-300">
         Ranked shortlist · {rows.length}
       </h2>
-      <span className="text-[11px] text-bone-400 font-mono">click a row →</span>
+      <span className="text-[11px] text-bone-400 font-mono">hover a row →</span>
     </div>
     <div
       ref={scroll.ref}
       onWheel={scroll.onWheel}
-      className="max-h-[60vh] overflow-auto custom-scroll overscroll-contain"
-      style={{ overscrollBehavior: "contain" }}
+      className="max-h-[60vh] overflow-auto custom-scroll"
+      style={{ overscrollBehavior: "auto" }}
       data-lenis-prevent
     >
 
@@ -72,7 +79,9 @@ export const ResultsTable: React.FC<Props> = ({ rows, onSelect, selectedId }) =>
             return (
               <tr
                 key={r.candidate_id}
-                onClick={() => onSelect(r)}
+                onMouseEnter={() => onSelect(r)}
+                onFocus={() => onSelect(r)}
+                tabIndex={0}
                 className={`row-hover border-t hairline cursor-pointer transition-colors ${
                   selected ? "bg-bone-50 text-ink-950" : ""
                 }`}
@@ -96,4 +105,3 @@ export const ResultsTable: React.FC<Props> = ({ rows, onSelect, selectedId }) =>
   </section>
   );
 };
-
